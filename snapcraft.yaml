@@ -1,0 +1,141 @@
+name: subutai
+version: "4.0.4-SNAPSHOT"
+confinement: devmode
+summary: Open Source LXC orchestration tool
+description: "For more details please visit our site: https://subut.ai"
+
+apps:
+        subutai:
+                command: bin/subutai
+        p2p:
+                command: bin/p2p
+        attach:
+                command: bin/lxc-attach
+        btrfsinit:
+                command: wrappers/btrfsinit
+
+        agent-service:
+                command: wrappers/agent
+                daemon: simple
+        rngd-service:
+                command: sbin/rngd -f -r /dev/urandom
+                daemon: simple
+        p2p-service:
+                command: bin/p2p daemon -save /var/snap/subutai/current/p2p.save
+                daemon: simple
+        dhcp-service:
+                command: wrappers/dhcpd
+                daemon: simple
+        dns-service:
+                command: sbin/dnsmasq -k --address=/gw.intra.lan/10.10.10.1
+                daemon: simple
+        ovs-init-db-service:
+                command: wrappers/ovs-init-db
+                daemon: simple
+        ovs-init-switch-service:
+                command: wrappers/ovs-init-switch
+                daemon: simple
+        ovs-init-br-service:
+                command: wrappers/ovs-init-br
+                daemon: simple
+        nginx-service:
+                command: wrappers/nginx start
+                daemon: simple
+
+parts:
+        wrappers:
+                plugin: dump 
+                source: https://github.com/subutai-io/snap.git 
+        ovs:
+                plugin: autotools
+                source: https://github.com/openvswitch/ovs.git 
+                snap:
+                        - sbin/ovsdb-server
+                        - bin/ovsdb-tool
+                        - bin/ovs-ofctl
+                        - bin/ovs-vsctl
+                        - sbin/ovs-vswitchd
+                        - share/openvswitch/vswitch.ovsschema
+                        - -etc
+                        - -include
+        btrfs-progs:
+                plugin: autotools
+                configflags: ["--disable-documentation"]
+                source: https://github.com/subutai-io/btrfs-progs.git 
+                snap:
+                        - bin/btrfs  
+                        - bin/btrfsck  
+                        - bin/mkfs.btrfs 
+                        - -include
+        curl:
+                plugin: autotools
+                source: https://github.com/curl/curl.git
+                snap:
+                        - bin/curl
+                        - -include
+        dnsmasq:
+                plugin: make
+                source: git://thekelleys.org.uk/dnsmasq.git
+                organize:
+                        usr/local/sbin: sbin 
+                snap:
+                        - sbin/dnsmasq
+                        - -usr/local/share
+        lxc:
+                plugin: autotools
+                configflags: ["--datadir=/snap/subutai/current/share", "--with-config-path=/var/snap/subutai/common/lxc"]
+                source: https://github.com/lxc/lxc.git
+                stage-packages:
+                        - libcap-dev
+                organize:
+                        snap/subutai/current/share: share 
+                snap:
+                        - bin/lxc-attach
+                        - etc/default
+                        - etc/lxc
+                        - lib
+                        - libexec/lxc
+                        - sbin/init.lxc
+                        - share/lxc
+                        - -include
+                        - -share/doc
+                        - -usr
+
+        lxcfs:
+                plugin: autotools
+                configflags: ["--prefix=/snap/subutai/current"]
+                source: https://github.com/lxc/lxcfs.git
+                organize:
+                        snap/subutai/current/share: share
+                        snap/subutai/current/bin: bin
+                        snap/subutai/current/lib: lib
+                snap:
+                        - -snap
+        p2p:
+                plugin: make
+                source: https://github.com/subutai-io/p2p.git 
+        rngd:
+                plugin: autotools
+                source: https://github.com/cernekee/rng-tools.git
+                snap:
+                        - sbin/rngd
+        subutai:
+                plugin: make
+                source: https://github.com/subutai-io/agent.git 
+        uidmapshift:
+                plugin: make
+                makefile: /home/ubuntu/subutai/extras/wrappers/.umsmake 
+                source: lp:~serge-hallyn/+junk/nsexec
+                organize:
+                        usr/bin: bin
+                snap:
+                        - bin/uidmapshift
+
+        nginx:
+                plugin: autotools
+                source: http://nginx.org/download/nginx-1.10.1.tar.gz
+                configflags: ["--conf-path=/snap/subutai/current/etc/nginx/nginx.conf", "--error-log-path=/var/snap/subutai/current/nginx/log/error.log", "--http-log-path=/var/snap/subutai/current/nginx/log/access.log", "--pid-path=/var/snap/subutai/current/nginx/run/nginx.pid", "--lock-path=/var/snap/subutai/current/nginx/run/nginx.lock", "--http-client-body-temp-path=/var/snap/subutai/current/nginx/cache/client_temp", "--http-proxy-temp-path=/var/snap/subutai/current/nginx/cache/proxy_temp", "--http-fastcgi-temp-path=/var/snap/subutai/current/nginx/cache/fastcgi_temp", "--http-uwsgi-temp-path=/var/snap/subutai/current/nginx/cache/uwsgi_temp", "--http-scgi-temp-path=/var/snap/subutai/current/nginx/cache/scgi_temp", "--with-http_ssl_module", "--with-http_realip_module", "--with-http_addition_module", "--with-http_sub_module", "--with-http_dav_module", "--with-http_flv_module", "--with-http_mp4_module", "--with-http_gunzip_module", "--with-http_gzip_static_module", "--with-http_random_index_module", "--with-http_secure_link_module", "--with-http_stub_status_module", "--with-http_auth_request_module", "--with-threads", "--with-stream", "--with-stream_ssl_module", "--with-http_slice_module", "--with-mail", "--with-mail_ssl_module", "--with-file-aio", "--with-http_v2_module", "--with-ipv6"]
+                snap:
+                        - -html
+                        - -var
+                        - -snap

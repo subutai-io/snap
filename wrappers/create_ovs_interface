@@ -1,0 +1,66 @@
+#!/bin/bash
+
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+# creating default ovs bridge and ports durin lxc startup
+MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/vlan)"
+if [ "$MNG_VLAN" == "" ]; then
+        MNG_VLAN=2
+	echo "$MNG_VLAN" > $SUBUTAI_DATA_PREFIX/vlan
+fi
+
+vlan="$(grep '#vlan_id' /var/snap/subutai/common/lxc/$1/config | awk '{print $3}')"
+gateway="$(grep 'lxc.network.ipv4.gateway' /var/snap/subutai/common/lxc/$1/config | awk '{print $3}')"
+
+if [ "$5" == "management" ]; then
+	ovs-vsctl --if-exists del-port wan $5
+	ovs-vsctl --may-exist add-port wan $5
+	ovs-vsctl set port $5 tag=$MNG_VLAN
+	ps aux | grep "dhclient mng-net" | awk '{print $2}' | xargs kill
+        dhclient -r mng-net
+        ifconfig mng-net 10.10.10.254/24
+
+        for i in 5005 8443 8444; do
+		for j in wan eth1 eth2; do iptables -t nat -A PREROUTING -i $j -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i ; done
+        done
+	for j in wan eth1 eth2; do iptables -t nat -A PREROUTING -i $j -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22 ; done
+
+        exit 0
+elif [ "$vlan" ]; then
+        ovs-vsctl --may-exist add-br gw-$vlan
+	ovs-vsctl set bridge gw-$vlan stp-enable=true
+	ovs-vsctl --if-exists set port gw-$vlan "tag=$vlan"
+        ovs-vsctl --if-exists del-port gw-$vlan $5
+        ovs-vsctl add-port gw-$vlan $5 tag=$vlan
+        cat <<EOF > /writable/system-data/etc/network/interfaces.d/gw-$vlan
+allow-env gw-$vlan
+iface gw-$vlan inet static
+  address $gateway
+  netmask 255.255.255.0
+EOF
+        ifconfig gw-$vlan $gateway/24
+	echo -e "\n$gateway	gw.intra.lan" >> /var/snap/subutai/common/lxc/$1/rootfs/etc/hosts
+
+	ipaddr=$(grep "lxc.network.ipv4 " /var/snap/subutai/common/lxc/$1/config | awk -F'[ /]' '{print $3}')
+	port=$(expr 10000 + `echo $ipaddr | cut -d'.' -f4`)
+	if [ "$ipaddr" != "" ]; then
+		for i in {1..10}; do
+			if [ "$(iptables-save | grep -c "A PREROUTING -i p2p$vlan -p tcp -m tcp --dport $port -j DNAT --to-destination $ipaddr:22")" != "0" ]; then
+				break
+			fi
+			iptables -t nat -A PREROUTING -i p2p$vlan -p tcp -m tcp --dport $port -j DNAT --to-destination $ipaddr:22
+		done
+	fi
+	#of_port=$(ovs-ofctl queue-get-config gw-$vlan gw-$vlan | cut -d"=" -f3)
+        ovs-ofctl add-flow gw-$vlan "priority=2600,in_port=LOCAL,ip,nw_src=10.10.10.1 actions=normal"
+        ovs-ofctl add-flow gw-$vlan "priority=2600,in_port=LOCAL,ip,nw_src=$gateway actions=normal"
+        ovs-ofctl add-flow gw-$vlan "priority=2500,in_port=LOCAL,ip,nw_src=10.0.0.0/8 actions=drop"
+        ovs-ofctl add-flow gw-$vlan "priority=2500,in_port=LOCAL,ip,nw_src=172.16.0.0/12 actions=drop"
+        ovs-ofctl add-flow gw-$vlan "priority=2500,in_port=LOCAL,ip,nw_src=192.168.0.0/16 actions=drop"
+
+else
+        ovs-vsctl --if-exists del-port lxc-br $5
+        ovs-vsctl --may-exist add-port lxc-br $5
+	echo -e "\n10.10.0.254  gw.intra.lan" >> /var/snap/subutai/common/lxc/$1/rootfs/etc/hosts
+fi

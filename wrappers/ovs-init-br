@@ -1,0 +1,74 @@
+#!/bin/bash
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+#MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/vlan)"
+if [ "$MNG_VLAN" == "" ]; then
+        MNG_VLAN=2
+	echo "$MNG_VLAN" > $SUBUTAI_DATA_PREFIX/vlan
+fi
+
+mkdir -p /var/run/openvswitch/
+mkdir -p $SUBUTAI_DATA_PREFIX/subutai-network/
+
+while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
+	sleep 1
+	ovs-vsctl --may-exist add-br wan
+done
+
+cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
+allow-hotplug eth0
+iface eth0 inet manual
+EOF
+
+ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
+ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
+ovs-vsctl set port mng-net tag=$MNG_VLAN
+
+ovs-vsctl --may-exist add-br lxc-br
+ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal
+ifconfig nat 10.10.0.254/24
+
+iptables -t nat -A POSTROUTING -j MASQUERADE
+iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-fill
+
+ifup -a --allow=env
+
+while true; do
+	timeout 10 dhclient eth0
+	if [ "$?" == "0" ]; then
+		ovs-vsctl --may-exist add-port wan eth0
+		ovs-vsctl --if-exists del-port wan eth1
+		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
+		ifconfig eth0 0
+	else
+		ovs-vsctl --may-exist add-port wan eth1
+		ovs-vsctl --if-exists del-port wan eth0
+		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth1 | grep ether | awk '{print $2}')
+		ifconfig eth1 0
+	fi
+
+	if [ "$(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')" != "wan" ]; then
+		ip route del 0/0
+	fi
+	timeout 10 dhclient wan
+	timeout 10 dhclient eth2
+	timeout 10 dhclient eth1
+
+	if [ "$AUTOBUILD_IP" != "" ]; then
+		if [ "$(ovs-vsctl list-ports wan | grep -c eth0)" == "1" ]; then
+			IP=$(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
+		else
+			IP=$(ifconfig eth2 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
+		fi
+		echo $IP | nc $AUTOBUILD_IP 48723
+		AUTOBUILD_IP=""
+	fi
+
+	if [ "$(ifconfig mng-net | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')" != "10.10.10.254" ]; then
+		timeout 10 dhclient mng-net
+	fi
+
+	sleep 10
+	ps aux | egrep "dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
+done

@@ -1,0 +1,30 @@
+[agent]
+gpgUser =
+gpgPassword = 12345678
+debug = true 
+appPrefix = /snap/subutai/current/
+dataPrefix = /var/snap/subutai/current/
+lxcPrefix = /var/snap/subutai/common/lxc/
+
+[management]
+gpgUser =
+port = 8443
+host = 10.10.10.1
+secret = secret
+restPublicKey = /rest/v1/security/keyman/getpublickeyring
+
+[cdn]
+url = cdn.subut.ai
+sslport = 8338
+allowinsecure = false
+
+[influxdb]
+server = 10.10.10.1
+user = root
+pass = root
+db = metrics
+
+[template]
+version = 4.0.4
+branch = dev
+arch = amd64
