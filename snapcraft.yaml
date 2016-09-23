@@ -125,7 +125,7 @@ parts:
                 source: https://github.com/subutai-io/agent.git 
         uidmapshift:
                 plugin: make
-                makefile: extras/.umsmake 
+                makefile: ../../../extras/.umsmake 
                 source: lp:~serge-hallyn/+junk/nsexec
                 organize:
                         usr/bin: bin
