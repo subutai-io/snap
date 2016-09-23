@@ -46,6 +46,7 @@ parts:
         wrappers:
                 plugin: dump 
                 source: https://github.com/subutai-io/snap.git 
+                source-subdir: extras
         ovs:
                 plugin: autotools
                 source: https://github.com/openvswitch/ovs.git 
@@ -124,7 +125,7 @@ parts:
                 source: https://github.com/subutai-io/agent.git 
         uidmapshift:
                 plugin: make
-                makefile: /home/ubuntu/subutai/extras/wrappers/.umsmake 
+                makefile: extras/.umsmake 
                 source: lp:~serge-hallyn/+junk/nsexec
                 organize:
                         usr/bin: bin
