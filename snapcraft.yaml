@@ -78,6 +78,13 @@ parts:
                 snap:
                         - bin/curl
                         - -include
+        cgmanager:
+                plugin: autotools
+                source: git://github.com/lxc/cgmanager
+                snap:
+                        - lib
+                        - libexec
+                        - sbin
         dnsmasq:
                 plugin: make
                 source: git://thekelleys.org.uk/dnsmasq.git
