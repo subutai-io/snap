@@ -63,6 +63,10 @@ parts:
                 plugin: autotools
                 configflags: ["--disable-documentation"]
                 source: https://github.com/subutai-io/btrfs-progs.git 
+                build-packages:
+                        - libblkid-dev
+                        - e2fslibs-dev 
+                        - liblzo2-dev
                 snap:
                         - bin/btrfs  
                         - bin/btrfsck  
@@ -86,7 +90,8 @@ parts:
                 plugin: autotools
                 configflags: ["--datadir=/snap/subutai/current/share", "--with-config-path=/var/snap/subutai/common/lxc"]
                 source: https://github.com/lxc/lxc.git
-                stage-packages:
+                build-packages:
+                        - pkg-config
                         - libcap-dev
                 organize:
                         snap/subutai/current/share: share 
@@ -106,6 +111,9 @@ parts:
                 plugin: autotools
                 configflags: ["--prefix=/snap/subutai/current"]
                 source: https://github.com/lxc/lxcfs.git
+                build-packages:
+                        - libpam0g-dev
+                        - libfuse-dev 
                 organize:
                         snap/subutai/current/share: share
                         snap/subutai/current/bin: bin
@@ -113,16 +121,29 @@ parts:
                 snap:
                         - -snap
         p2p:
-                plugin: make
+                #plugin: make
+                plugin: go
+                #go-buildtags: ["-o p2p"]
                 source: https://github.com/subutai-io/p2p.git 
+                build-packages:
+                        - golang
+                organize:
+                        bin/p2p.git: bin/p2p
         rngd:
                 plugin: autotools
                 source: https://github.com/cernekee/rng-tools.git
                 snap:
                         - sbin/rngd
         subutai:
-                plugin: make
+                #plugin: make
+                plugin: go 
+                #go-buildtags: ["-w", "-s", "-X main.Version=4.0.4-SNAPSHOT", "-o subutai"]
                 source: https://github.com/subutai-io/agent.git 
+                build-packages:
+                        - lxc-dev
+                        - golang
+                organize:
+                        bin/agent.git: bin/subutai
         uidmapshift:
                 plugin: make
                 makefile: ../../../extras/.umsmake 
@@ -135,6 +156,9 @@ parts:
         nginx:
                 plugin: autotools
                 source: http://nginx.org/download/nginx-1.10.1.tar.gz
+                build-packages:
+                        - libpcre3-dev 
+                        - libssl-dev
                 configflags: ["--conf-path=/snap/subutai/current/etc/nginx/nginx.conf", "--error-log-path=/var/snap/subutai/current/nginx/log/error.log", "--http-log-path=/var/snap/subutai/current/nginx/log/access.log", "--pid-path=/var/snap/subutai/current/nginx/run/nginx.pid", "--lock-path=/var/snap/subutai/current/nginx/run/nginx.lock", "--http-client-body-temp-path=/var/snap/subutai/current/nginx/cache/client_temp", "--http-proxy-temp-path=/var/snap/subutai/current/nginx/cache/proxy_temp", "--http-fastcgi-temp-path=/var/snap/subutai/current/nginx/cache/fastcgi_temp", "--http-uwsgi-temp-path=/var/snap/subutai/current/nginx/cache/uwsgi_temp", "--http-scgi-temp-path=/var/snap/subutai/current/nginx/cache/scgi_temp", "--with-http_ssl_module", "--with-http_realip_module", "--with-http_addition_module", "--with-http_sub_module", "--with-http_dav_module", "--with-http_flv_module", "--with-http_mp4_module", "--with-http_gunzip_module", "--with-http_gzip_static_module", "--with-http_random_index_module", "--with-http_secure_link_module", "--with-http_stub_status_module", "--with-http_auth_request_module", "--with-threads", "--with-stream", "--with-stream_ssl_module", "--with-http_slice_module", "--with-mail", "--with-mail_ssl_module", "--with-file-aio", "--with-http_v2_module", "--with-ipv6"]
                 snap:
                         - -html
