@@ -33,7 +33,7 @@ elif [ "$vlan" ]; then
 	ovs-vsctl --if-exists set port gw-$vlan "tag=$vlan"
         ovs-vsctl --if-exists del-port gw-$vlan $5
         ovs-vsctl add-port gw-$vlan $5 tag=$vlan
-        cat <<EOF > /writable/system-data/etc/network/interfaces.d/gw-$vlan
+        cat <<EOF > $SUBUTAI_SYS_ETC/network/interfaces.d/gw-$vlan
 allow-env gw-$vlan
 iface gw-$vlan inet static
   address $gateway

@@ -100,6 +100,7 @@ parts:
                         - etc/default
                         - etc/lxc
                         - lib
+                        - -libexec/lxc/lxc-user-nic
                         - libexec/lxc
                         - sbin/init.lxc
                         - share/lxc
@@ -123,7 +124,6 @@ parts:
         p2p:
                 #plugin: make
                 plugin: go
-                #go-buildtags: ["-o p2p"]
                 source: https://github.com/subutai-io/p2p.git 
                 build-packages:
                         - golang
@@ -137,7 +137,6 @@ parts:
         subutai:
                 #plugin: make
                 plugin: go 
-                #go-buildtags: ["-w", "-s", "-X main.Version=4.0.4-SNAPSHOT", "-o subutai"]
                 source: https://github.com/subutai-io/agent.git 
                 build-packages:
                         - lxc-dev

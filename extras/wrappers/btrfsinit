@@ -16,7 +16,7 @@ Where = /var/snap/subutai/common/lxc
 Type = btrfs
 
 [Install]
-WantedBy = multi-user.target" > /writable/system-data/etc/systemd/system/var-snap-subutai-common-lxc.mount
+WantedBy = multi-user.target" > $SUBUTAI_SYS_ETC/systemd/system/var-snap-subutai-common-lxc.mount
 
 systemctl daemon-reload
 systemctl start var-snap-subutai-common-lxc.mount

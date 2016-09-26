@@ -16,7 +16,7 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	ovs-vsctl --may-exist add-br wan
 done
 
-cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
+cat <<EOF > $SUBUTAI_SYS_ETC/network/interfaces.d/eth0
 allow-hotplug eth0
 iface eth0 inet manual
 EOF
