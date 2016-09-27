@@ -72,5 +72,5 @@ while true; do
 	fi
 
 	sleep 10
-	ps aux | egrep "dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
+	ps aux | egrep "dhclient $DEF_NIC|dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
 done

@@ -17,6 +17,9 @@ apps:
         agent-service:
                 command: wrappers/agent
                 daemon: simple
+        cgmanager-service:
+                command: wrappers/cgmanagerd
+                daemon: simple
         rngd-service:
                 command: sbin/rngd -f -r /dev/urandom
                 daemon: simple
