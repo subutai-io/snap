@@ -10,7 +10,7 @@ modprobe iptable_nat
 
 echo -e "openvswitch\niptable_nat" > $SUBUTAI_SYS_ETC/modules-load.d/subutai.conf
 
-while [ $(lsmod | /usr/bin/awk '{print $1}' | grep -c 'openvswitch\|iptable_nat') -lt 2 ]; do
+while [ $(lsmod | grep -c 'openvswitch\|iptable_nat') -lt 7 ]; do
 	echo "Unable to load openvswitch or iptable_nat kernel module. Please load module manually"
 	sleep 10 
 done

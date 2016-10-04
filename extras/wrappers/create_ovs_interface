@@ -10,14 +10,14 @@ if [ "$MNG_VLAN" == "" ]; then
 	echo "$MNG_VLAN" > $SUBUTAI_DATA_PREFIX/vlan
 fi
 
-vlan="$(grep '#vlan_id' /var/snap/subutai/common/lxc/$1/config | /usr/bin/awk '{print $3}')"
-gateway="$(grep 'lxc.network.ipv4.gateway' /var/snap/subutai/common/lxc/$1/config | /usr/bin/awk '{print $3}')"
+vlan="$(grep '#vlan_id' /var/snap/subutai/common/lxc/$1/config | awk '{print $3}')"
+gateway="$(grep 'lxc.network.ipv4.gateway' /var/snap/subutai/common/lxc/$1/config | awk '{print $3}')"
 
 if [ "$5" == "management" ]; then
 	ovs-vsctl --if-exists del-port wan $5
 	ovs-vsctl --may-exist add-port wan $5
 	ovs-vsctl set port $5 tag=$MNG_VLAN
-	ps aux | grep "dhclient mng-net" | /usr/bin/awk '{print $2}' | xargs kill
+	ps aux | grep "dhclient mng-net" | awk '{print $2}' | xargs kill
         dhclient -r mng-net
         ifconfig mng-net 10.10.10.254/24
 
@@ -42,7 +42,7 @@ EOF
         ifconfig gw-$vlan $gateway/24
 	echo -e "\n$gateway	gw.intra.lan" >> /var/snap/subutai/common/lxc/$1/rootfs/etc/hosts
 
-	ipaddr=$(grep "lxc.network.ipv4 " /var/snap/subutai/common/lxc/$1/config | /usr/bin/awk -F'[ /]' '{print $3}')
+	ipaddr=$(grep "lxc.network.ipv4 " /var/snap/subutai/common/lxc/$1/config | awk -F'[ /]' '{print $3}')
 	port=$(expr 10000 + `echo $ipaddr | cut -d'.' -f4`)
 	if [ "$ipaddr" != "" ]; then
 		for i in {1..10}; do

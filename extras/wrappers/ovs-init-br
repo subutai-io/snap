@@ -41,16 +41,16 @@ while true; do
 	if [ "$?" == "0" ]; then
 		ovs-vsctl --may-exist add-port wan $DEF_NIC
 		ovs-vsctl --if-exists del-port wan eth1
-		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show $DEF_NIC | grep ether | /usr/bin/awk '{print $2}')
+		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show $DEF_NIC | grep ether | awk '{print $2}')
 		ifconfig $DEF_NIC 0
 	else
 		ovs-vsctl --may-exist add-port wan eth1
 		ovs-vsctl --if-exists del-port wan $DEF_NIC
-		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth1 | grep ether | /usr/bin/awk '{print $2}')
+		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth1 | grep ether | awk '{print $2}')
 		ifconfig eth1 0
 	fi
 
-	if [ "$(/sbin/route -n | grep ^0.0.0.0 | /usr/bin/awk '{print $8}')" != "wan" ]; then
+	if [ "$(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')" != "wan" ]; then
 		ip route del 0/0
 	fi
 	timeout 10 dhclient wan
@@ -59,18 +59,18 @@ while true; do
 
 	if [ "$AUTOBUILD_IP" != "" ]; then
 		if [ "$(ovs-vsctl list-ports wan | grep -c $DEF_NIC)" == "1" ]; then
-			IP=$(ifconfig wan | grep 'inet addr' | /usr/bin/awk -F: '{print $2}' | /usr/bin/awk '{print $1}')
+			IP=$(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
 		else
-			IP=$(ifconfig eth2 | grep 'inet addr' | /usr/bin/awk -F: '{print $2}' | /usr/bin/awk '{print $1}')
+			IP=$(ifconfig eth2 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
 		fi
 		echo $IP | nc $AUTOBUILD_IP 48723
 		AUTOBUILD_IP=""
 	fi
 
-	if [ "$(ifconfig mng-net | grep 'inet addr' | /usr/bin/awk -F: '{print $2}' | /usr/bin/awk '{print $1}')" != "10.10.10.254" ]; then
+	if [ "$(ifconfig mng-net | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')" != "10.10.10.254" ]; then
 		timeout 10 dhclient mng-net
 	fi
 
 	sleep 10
-	ps aux | egrep "dhclient $DEF_NIC|dhclient eth|dhclient wan|dhclient mng-net" | /usr/bin/awk '{print $2}' | xargs kill
+	ps aux | egrep "dhclient $DEF_NIC|dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
 done
