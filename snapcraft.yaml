@@ -13,6 +13,8 @@ apps:
                 command: bin/lxc-attach
         btrfsinit:
                 command: wrappers/btrfsinit
+        criu:
+                command: bin/criu
 
         agent-service:
                 command: wrappers/agent
@@ -88,6 +90,34 @@ parts:
                         - lib
                         - libexec
                         - sbin
+        libprotobuf-c:
+                plugin: autotools
+                source: https://github.com/protobuf-c/protobuf-c.git
+                build-packages:
+                        - libprotoc-dev 
+                snap:
+                        - lib
+        criu:
+                plugin: make
+                make-parameters: ["-i", "-k"]
+                source: https://github.com/xemul/criu.git
+                build-packages:
+                        - build-essential
+                        - libprotobuf-dev
+                        - libprotobuf-c-dev
+                        - protobuf-c-compiler
+                        - protobuf-compiler
+                        - python-protobuf
+                        - libnl-3-dev
+                        - libcap-dev
+                organize:
+                        usr/local/sbin: bin
+                        usr/local/lib: lib 
+                snap:
+                        - bin/criu
+                        - lib
+                        - -usr/local
+
         dnsmasq:
                 plugin: make
                 source: git://thekelleys.org.uk/dnsmasq.git
