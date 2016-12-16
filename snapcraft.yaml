@@ -28,9 +28,6 @@ apps:
         p2p-service:
                 command: bin/p2p daemon -save /var/snap/subutai/current/p2p.save
                 daemon: simple
-        dhcp-service:
-                command: bin/dhcpd-wrapper
-                daemon: simple
         dns-service:
                 command: sbin/dnsmasq -k --address=/gw.intra.lan/10.10.10.1
                 daemon: simple
@@ -52,6 +49,7 @@ parts:
                 plugin: dump 
                 source: https://github.com/subutai-io/snap.git 
                 source-subdir: extras
+                source-branch: dev
         ovs:
                 plugin: autotools
                 source: https://github.com/openvswitch/ovs.git 
