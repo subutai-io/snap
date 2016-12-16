@@ -6,8 +6,4 @@ while [ ! -S /sys/fs/cgroup/cgmanager/sock ]; do
 	sleep 1
 done
 
-while [ ! -d /var/run/lxcfs/controllers ]; do
-	sleep 1
-done
-
 exec $SUBUTAI_APP_PREFIX/bin/subutai daemon

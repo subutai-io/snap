@@ -148,20 +148,6 @@ parts:
                         - -include
                         - -share/doc
                         - -usr
-
-        lxcfs:
-                plugin: autotools
-                configflags: ["--prefix=/snap/subutai/current"]
-                source: https://github.com/lxc/lxcfs.git
-                build-packages:
-                        - libpam0g-dev
-                        - libfuse-dev 
-                organize:
-                        snap/subutai/current/share: share
-                        snap/subutai/current/bin: bin
-                        snap/subutai/current/lib: lib
-                snap:
-                        - -snap
         p2p:
                 #plugin: make
                 plugin: go
