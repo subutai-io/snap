@@ -179,7 +179,7 @@ parts:
                 #plugin: make
                 plugin: go 
                 source: https://github.com/subutai-io/agent.git 
-                source-branch: snapcraft-merge
+                source-branch: dev
                 go-importpath: github.com/subutai-io/agent
                 build-packages:
                         - lxc-dev
