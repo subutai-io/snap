@@ -16,6 +16,9 @@ apps:
         criu:
                 command: bin/criu
 
+        dhcp-service:
+                command: bin/dhcpd-wrapper
+                daemon: simple
         agent-service:
                 command: bin/agent-wrapper
                 daemon: simple
