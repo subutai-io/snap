@@ -1,5 +1,5 @@
 name: subutai
-version: "4.0.4-SNAPSHOT"
+version: "4.0.12-SNAPSHOT"
 confinement: devmode
 summary: Open Source LXC orchestration tool
 description: "For more details please visit our site: https://subut.ai"
@@ -12,15 +12,15 @@ apps:
         attach:
                 command: bin/lxc-attach
         btrfsinit:
-                command: wrappers/btrfsinit
+                command: bin/btrfsinit
         criu:
                 command: bin/criu
 
         agent-service:
-                command: wrappers/agent
+                command: bin/agent-wrapper
                 daemon: simple
         cgmanager-service:
-                command: wrappers/cgmanagerd
+                command: bin/cgmanagerd-wrapper
                 daemon: simple
         rngd-service:
                 command: sbin/rngd -f -r /dev/urandom
@@ -29,22 +29,22 @@ apps:
                 command: bin/p2p daemon -save /var/snap/subutai/current/p2p.save
                 daemon: simple
         dhcp-service:
-                command: wrappers/dhcpd
+                command: bin/dhcpd-wrapper
                 daemon: simple
         dns-service:
                 command: sbin/dnsmasq -k --address=/gw.intra.lan/10.10.10.1
                 daemon: simple
         ovs-init-db-service:
-                command: wrappers/ovs-init-db
+                command: bin/ovs-init-db
                 daemon: simple
         ovs-init-switch-service:
-                command: wrappers/ovs-init-switch
+                command: bin/ovs-init-switch
                 daemon: simple
         ovs-init-br-service:
-                command: wrappers/ovs-init-br
+                command: bin/ovs-init-br
                 daemon: simple
         nginx-service:
-                command: wrappers/nginx start
+                command: bin/nginx-wrapper start
                 daemon: simple
 
 parts:
@@ -178,11 +178,13 @@ parts:
                 #plugin: make
                 plugin: go 
                 source: https://github.com/subutai-io/agent.git 
+                source-branch: snapcraft-merge
+                go-importpath: github.com/subutai-io/agent
                 build-packages:
                         - lxc-dev
                         - golang
                 organize:
-                        bin/agent.git: bin/subutai
+                        bin/agent: bin/subutai
         uidmapshift:
                 plugin: make
                 makefile: ../../../extras/.umsmake 
