@@ -9,8 +9,6 @@ apps:
                 command: bin/subutai
         p2p:
                 command: bin/p2p
-        attach:
-                command: bin/lxc-attach
         btrfsinit:
                 command: bin/btrfsinit
         criu:
@@ -137,7 +135,6 @@ parts:
                 organize:
                         snap/subutai/current/share: share 
                 snap:
-                        - bin/lxc-attach
                         - etc/default
                         - etc/lxc
                         - lib
@@ -147,6 +144,7 @@ parts:
                         - share/lxc
                         - -include
                         - -share/doc
+                        - -bin
                         - -usr
         p2p:
                 #plugin: make
