@@ -160,11 +160,10 @@ parts:
                 snap:
                         - sbin/rngd
         subutai:
-                #plugin: make
-                plugin: go 
+                plugin: make
                 source: https://github.com/subutai-io/agent.git 
                 source-branch: dev
-                go-importpath: github.com/subutai-io/agent
+                make-parameters: [snapcraft]
                 build-packages:
                         - lxc-dev
                         - golang
