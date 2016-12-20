@@ -9,8 +9,6 @@ apps:
                 command: bin/subutai
         p2p:
                 command: bin/p2p
-        attach:
-                command: bin/lxc-attach
         btrfsinit:
                 command: bin/btrfsinit
         criu:
@@ -137,7 +135,6 @@ parts:
                 organize:
                         snap/subutai/current/share: share 
                 snap:
-                        - bin/lxc-attach
                         - etc/default
                         - etc/lxc
                         - lib
@@ -147,26 +144,29 @@ parts:
                         - share/lxc
                         - -include
                         - -share/doc
+                        - -bin
                         - -usr
         p2p:
-                #plugin: make
-                plugin: go
+                plugin: make
+                make-parameters: [--always-make, snapcraft]
                 source: https://github.com/subutai-io/p2p.git 
+                source-branch: dev
                 build-packages:
                         - golang
                 organize:
-                        bin/p2p.git: bin/p2p
+                        opt/subutai/bin/p2p: bin/p2p
+                snap:
+                        - -opt
         rngd:
                 plugin: autotools
                 source: https://github.com/cernekee/rng-tools.git
                 snap:
                         - sbin/rngd
         subutai:
-                #plugin: make
-                plugin: go 
+                plugin: make
                 source: https://github.com/subutai-io/agent.git 
                 source-branch: dev
-                go-importpath: github.com/subutai-io/agent
+                make-parameters: [snapcraft]
                 build-packages:
                         - lxc-dev
                         - golang
