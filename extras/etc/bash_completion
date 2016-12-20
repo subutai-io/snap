@@ -1,0 +1,33 @@
+_subutai()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="attach backup batch clone cleanup config daemon demote destroy export import info hostname list metrics p2p portmap promote proxy quota rename restore stats start stop tunnel update vxlan help"
+
+    case "${prev}" in
+        import)
+            COMPREPLY=( $(compgen -W "master management ubuntu16" -- ${cur}) )
+            return 0
+            ;;
+        clone | demote | export)
+            COMPREPLY=( $(compgen -W "$(subutai list -t | tail -n +3)" -- ${cur}) )
+            return 0
+            ;;
+        start | stop | attach | promote | rename)
+            COMPREPLY=( $(compgen -W "$(subutai list -c | tail -n +3)" -- ${cur}) )
+            return 0
+            ;;
+        destroy)
+            COMPREPLY=( $(compgen -W "$(subutai list | tail -n +3)" -- ${cur}) )
+            return 0
+            ;;
+        *)
+        ;;
+    esac
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+complete -F _subutai subutai
+
