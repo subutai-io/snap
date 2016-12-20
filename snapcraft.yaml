@@ -147,13 +147,16 @@ parts:
                         - -bin
                         - -usr
         p2p:
-                #plugin: make
-                plugin: go
+                plugin: make
+                make-parameters: [--always-make, snapcraft]
                 source: https://github.com/subutai-io/p2p.git 
+                source-branch: dev
                 build-packages:
                         - golang
                 organize:
-                        bin/p2p.git: bin/p2p
+                        opt/subutai/bin/p2p: bin/p2p
+                snap:
+                        - -opt
         rngd:
                 plugin: autotools
                 source: https://github.com/cernekee/rng-tools.git
