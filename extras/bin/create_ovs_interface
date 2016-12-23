@@ -3,11 +3,9 @@
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
-# creating default ovs bridge and ports durin lxc startup
-MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/vlan)"
-if [ "$MNG_VLAN" == "" ]; then
-        MNG_VLAN=2
-	echo "$MNG_VLAN" > $SUBUTAI_DATA_PREFIX/vlan
+MNG_VLAN=2
+if [ -f "$SUBUTAI_DATA_PREFIX/.vlan" ]; then
+	MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/.vlan)"
 fi
 
 vlan="$(grep '#vlan_id' /var/snap/subutai/common/lxc/$1/config | awk '{print $3}')"

@@ -57,10 +57,10 @@ function restoreNet() {
         vboxmanage dhcpserver modify --ifname vboxnet0 --enable
 
         vboxmanage modifyvm $clone --nic4 none
-        #vboxmanage modifyvm $clone --nic3 hostonly
-        #vboxmanage modifyvm $clone --hostonlyadapter3 vboxnet0
-        #vboxmanage modifyvm $clone --nic2 nat
-        #vboxmanage modifyvm $clone --natpf2 "ssh-fwd,tcp,,4567,,22"
+        vboxmanage modifyvm $clone --nic3 hostonly
+        vboxmanage modifyvm $clone --hostonlyadapter3 vboxnet0
+        vboxmanage modifyvm $clone --nic2 nat
+        vboxmanage modifyvm $clone --natpf2 "ssh-fwd,tcp,,4567,,22"
         vboxmanage modifyvm $clone --nic1 bridged
         vboxmanage modifyvm $clone --bridgeadapter1 $(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')
 }
@@ -93,7 +93,7 @@ function export_box() {
                 -e 'r inject.vagrant' -e 'd' -e '}' -i $dst/Vagrantfile
 }
 
-function ifLocalSnapExist() {
+function localSnap() {
 	local snap="$(ls subutai*.snap 2>/dev/null | tail -1)"
 	echo $snap
 }
@@ -101,12 +101,9 @@ function ifLocalSnapExist() {
 function installLocalSnap() {
 	local snap="$1"
 	echo "Copying local snap to vm"
-	sshpass -p "ubuntai" scp -o StrictHostKeyChecking=no -P5567 $snap subutai@localhost:~
+	sshpass -p "ubuntai" scp -o StrictHostKeyChecking=no -P5567 $snap subutai@localhost:/tmp
 	echo "Installing local snap"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --dangerous --devmode /home/subutai/$snap"
-	while [ "$(sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo rm -f /home/subutai/$snap"; echo $?)" != "0" ]; do
-		sleep 2
-	done
+	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --dangerous --devmode /tmp/$snap"
 }
 
 function installSnapFromStore() {
@@ -122,7 +119,7 @@ function waitForSubutai() {
 }
 
 function waitForSnapd() {
-	echo "Waiting for Snapd"
+	echo "Waiting for snapd"
 	while [ "$(sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap info subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
 		sleep 2
 	done
@@ -130,29 +127,63 @@ function waitForSnapd() {
 
 function setAutobuildIP() {
 	local ip=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep -Po 'inet \K[\d.]+')
-	echo "Setting loopback IP: $ip"
-        sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "echo $ip > /home/subutai/.ip"
+	echo "Setting loopback IP $ip"
+        sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $ip > /var/snap/subutai/current/.ip'"
 }
 
 function waitPeerIP() {
         echo "Waiting for Subutai IP address"
 	local ip="$(nc -l 48723)"
-	echo -e "\\nPlease use following command to access your new Subutai:\\nssh subutai@$ip"
+	timeout 300 echo -e "*******\\nPlease use following command to access your resource host:\\nssh root@$ip\\nor login \"subutai\" with password \"ubuntai\"\\n*******"
 	ssh-keygen -f ~/.ssh/known_hosts -R $ip > /dev/null 2>&1
 }
 
-#####
-### Main function
-#####
+function setPeerVlan() {
+	local vlan="$1"
+	echo "Setting vlan $vlan"
+	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $vlan > /var/snap/subutai/current/.vlan'"
+}
+
+function addSshKey() {
+	echo "Adding user key to peer"
+	local key="$(ssh-add -L)"
+	if [ "$key" != "" ]; then
+		sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $key >> /root/.ssh/authorized_keys'"
+	fi
+}
+
+function readArgs() {
+	while [ $# -gt 0 ]; do
+		key="$1"
+
+		case $key in
+    		-t|--tag)
+    			TAG="$2"
+    			shift
+    		;;
+    		*)
+            		echo "Unknown key $key"
+    		;;
+		esac
+		shift
+	done
+}
+
+
+
+####################
+###### Main function
+####################
 
 EXPORT_DIR="/tmp"
 CLONE="subutai-16.04-$(date +%s)"
 
+readArgs "$@"
+
 cloneVm "$CLONE"
 waitForSnapd
-setAutobuildIP
 
-SNAP=$(ifLocalSnapExist)
+SNAP=$(localSnap)
 if [ "$SNAP" != "" ]; then
 	installLocalSnap "$SNAP"
 else
@@ -161,9 +192,17 @@ fi
 
 waitForSubutai
 
-btrfsInit
+if [ "$TAG" != "" ]; then
+	setPeerVlan "$TAG"
+fi
 
+btrfsInit
+addSshKey
+setAutobuildIP
+
+### No manipulation inside VM after this step
 stopVM "$CLONE"
 restoreNet "$CLONE"
 startVM "$CLONE"
 waitPeerIP
+
