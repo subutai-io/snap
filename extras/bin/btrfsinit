@@ -25,3 +25,6 @@ systemctl enable var-snap-subutai-common-lxc.mount
 mkdir -p /var/snap/subutai/common/lxc/tmpdir
 
 $SUBUTAI_APP_PREFIX/bin/btrfs quota enable /var/snap/subutai/common/lxc/tmpdir
+
+echo -e "\nif [ -f /snap/subutai/current/etc/bash_completion ]; then . /snap/subutai/current/etc/bash_completion; fi" >> /root/.bashrc 
+echo -e "\nif [ -f /snap/subutai/current/etc/bash_completion ]; then . /snap/subutai/current/etc/bash_completion; fi" >> /home/subutai/.bashrc 

@@ -2,10 +2,9 @@
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
-MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/vlan)"
-if [ "$MNG_VLAN" == "" ]; then
-        MNG_VLAN=2
-	echo "$MNG_VLAN" > $SUBUTAI_DATA_PREFIX/vlan
+MNG_VLAN=2
+if [ -f "$SUBUTAI_DATA_PREFIX/.vlan" ]; then
+        MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/.vlan)"
 fi
 
 mkdir -p /var/run/openvswitch/
@@ -18,10 +17,10 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	ovs-vsctl --may-exist add-br wan
 done
 
-cat <<EOF > $SUBUTAI_SYS_ETC/network/interfaces.d/$DEF_NIC
-allow-hotplug $DEF_NIC
-iface $DEF_NIC inet manual
-EOF
+#cat <<EOF > $SUBUTAI_SYS_ETC/network/interfaces.d/$DEF_NIC
+#allow-hotplug $DEF_NIC
+#iface $DEF_NIC inet manual
+#EOF
 
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
@@ -57,15 +56,13 @@ while true; do
 	timeout 10 dhclient eth2
 	timeout 10 dhclient eth1
 
-	if [ "$AUTOBUILD_IP" != "" ]; then
-		if [ "$(ovs-vsctl list-ports wan | grep -c $DEF_NIC)" == "1" ]; then
-			IP=$(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
-		else
-			IP=$(ifconfig eth2 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
+	if [ -f "$SUBUTAI_DATA_PREFIX/.ip" ]; then
+		echo $(subutai info ipaddr) | nc $(cat "$SUBUTAI_DATA_PREFIX/.ip") 48723
+		if [ "$(echo $?)" == "0" ]; then
+			rm -f "$SUBUTAI_DATA_PREFIX/.ip"
 		fi
-		echo $IP | nc $AUTOBUILD_IP 48723
-		AUTOBUILD_IP=""
-	fi
+	fi 
+
 
 	if [ "$(ifconfig mng-net | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')" != "10.10.10.254" ]; then
 		timeout 10 dhclient mng-net

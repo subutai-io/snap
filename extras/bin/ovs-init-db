@@ -38,5 +38,5 @@ if [ -f "/var/run/openvswitch/db.sock" ]; then
     echo "db.sock is already exist, skipping"
 else
     echo "starting ovsdb-server"
-    $SUBUTAI_APP_PREFIX/sbin/ovsdb-server --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --pidfile=/var/run/openvswitch/db.pid --unixct=/var/run/openvswitch/ovsdb.ctl $SUBUTAI_DATA_PREFIX/ovs/conf.db
+    $SUBUTAI_APP_PREFIX/bin/ovsdb-server --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --pidfile=/var/run/openvswitch/db.pid --unixct=/var/run/openvswitch/ovsdb.ctl $SUBUTAI_DATA_PREFIX/ovs/conf.db
 fi

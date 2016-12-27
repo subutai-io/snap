@@ -11,7 +11,7 @@ while [ $(ping 8.8.8.8 -c1 | grep -c "1 received") -ne 1 ]; do
         sleep 1
 done
 if [ "$1" == "start" ]; then
-        $SUBUTAI_APP_PREFIX/sbin/nginx -g "daemon off;"
+        $SUBUTAI_APP_PREFIX/bin/nginx -g "daemon off;"
 else
-        $SUBUTAI_APP_PREFIX/sbin/nginx "$@"
+        $SUBUTAI_APP_PREFIX/bin/nginx "$@"
 fi

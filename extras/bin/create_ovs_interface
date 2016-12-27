@@ -3,11 +3,9 @@
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
-# creating default ovs bridge and ports durin lxc startup
-MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/vlan)"
-if [ "$MNG_VLAN" == "" ]; then
-        MNG_VLAN=2
-	echo "$MNG_VLAN" > $SUBUTAI_DATA_PREFIX/vlan
+MNG_VLAN=2
+if [ -f "$SUBUTAI_DATA_PREFIX/.vlan" ]; then
+	MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/.vlan)"
 fi
 
 vlan="$(grep '#vlan_id' /var/snap/subutai/common/lxc/$1/config | awk '{print $3}')"
@@ -32,12 +30,12 @@ elif [ "$vlan" ]; then
 	ovs-vsctl --if-exists set port gw-$vlan "tag=$vlan"
         ovs-vsctl --if-exists del-port gw-$vlan $5
         ovs-vsctl add-port gw-$vlan $5 tag=$vlan
-        cat <<EOF > $SUBUTAI_SYS_ETC/network/interfaces.d/gw-$vlan
-allow-env gw-$vlan
-iface gw-$vlan inet static
-  address $gateway
-  netmask 255.255.255.0
-EOF
+#        cat <<EOF > $SUBUTAI_SYS_ETC/network/interfaces.d/gw-$vlan
+#allow-env gw-$vlan
+#iface gw-$vlan inet static
+#  address $gateway
+#  netmask 255.255.255.0
+#EOF
         ifconfig gw-$vlan $gateway/24
 	echo -e "\n$gateway	gw.intra.lan" >> /var/snap/subutai/common/lxc/$1/rootfs/etc/hosts
 
