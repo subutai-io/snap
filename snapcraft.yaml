@@ -87,6 +87,10 @@ parts:
         cgmanager:
                 plugin: autotools
                 source: git://github.com/lxc/cgmanager
+                build-packages:
+                        - libnih-dev
+                        - libnih-dbus-dev
+                        - libpam0g-dev
                 organize:
                         sbin: bin
                 snap:
