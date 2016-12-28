@@ -70,29 +70,6 @@ function btrfsInit() {
 	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo subutai.btrfsinit /dev/sdb"
 }
 
-function export_ova() {
-	local $clone="$1"
-        echo "Exporting OVA image"
-        mkdir -p "$EXPORT_DIR/ova"
-        vboxmanage export $clone -o $EXPORT_DIR/ova/${clone}.ova --ovf20
-}
-
-function export_box() {
-        mkdir -p "$EXPORT_DIR/vagrant/"
-        local dst="$EXPORT_DIR/vagrant/"
-	local clone="$1"
-
-        echo "Exporting Vagrant box"
-        vagrant init $clone ${clone}.box
-        vagrant package --base $clone --output $dst/${clone}.box
-
-        mv -f Vagrantfile .vagrant $dst
-
-        # inject.vagrant parameters into Vagrantfile
-        sed -e '/# config.vm.network "public_network"/ {' \
-                -e 'r inject.vagrant' -e 'd' -e '}' -i $dst/Vagrantfile
-}
-
 function localSnap() {
 	local snap="$(ls subutai*.snap 2>/dev/null | tail -1)"
 	echo $snap
@@ -152,6 +129,69 @@ function addSshKey() {
 	fi
 }
 
+function deployPeers() {
+        local peer=$(grep PEER "$1" | cut -d"=" -f2)
+        local rh=$(grep RH "$1" | cut -d"=" -f2)
+
+        if [ "$peer" == "" ] || [ "$rh" == "" ]; then
+                echo "Invalid config"
+                exit 1
+        fi
+
+        echo "Erecting $peer(x${rh}RH) peer. Please wait"
+
+        local i=0
+        while [ $i -lt $peer ]; do
+                local j=0
+                local vlan=$(shuf -i 1-4096 -n 1)
+                while [ $j -lt $rh ]; do
+                        local mhip=$($0 -t $vlan | grep "root@" | cut -d"@" -f2)
+                        if [ $j -eq 0 ]; then
+                                ssh -o StrictHostKeyChecking=no root@$mhip "sudo subutai import management"
+                                local arr[$i]=$mhip
+                        fi
+                        let "j=j+1"
+                done
+                let "i=i+1"
+        done
+
+        echo -e "\\nManagement IPs: ${arr[*]}"
+	exit 0
+}
+
+function exportOvaImg() {
+	local vm="$1"
+	local dir="../export/ova"
+        echo "Exporting OVA image"
+        mkdir -p "$dir"
+        vboxmanage export $vm -o $dir/${vm}.ova --ovf20
+	vboxmanage unregistervm --delete "$vm"
+	echo "Exported to $dir/${vm}.ova"
+}
+
+function exportBoxImg() {
+	local vm="$1"
+        local dir="../export/vagrant"
+	
+	if [ "$(which vagrant)" == "" ]; then
+		echo "Vagrant is requried to use this option"
+		vboxmanage unregistervm --delete "$vm"
+		exit 1
+	fi
+        echo "Exporting Vagrant box"
+        mkdir -p "$dir"
+        vagrant init $vm ${vm}.box
+        vagrant package --base $vm --output $dir/${vm}.box
+
+        mv -f Vagrantfile .vagrant $dir
+
+        # inject.vagrant parameters into Vagrantfile
+        sed -e '/# config.vm.network "public_network"/ {' \
+                -e 'r inject.vagrant' -e 'd' -e '}' -i $dir/Vagrantfile
+	vboxmanage unregistervm --delete "$vm"
+	echo "Exported to $dir/${vm}.box"
+}
+
 function readArgs() {
 	while [ $# -gt 0 ]; do
 		key="$1"
@@ -161,7 +201,15 @@ function readArgs() {
     			TAG="$2"
     			shift
     		;;
-    		*)
+		-e|--export)
+			EXPORT="$2"
+			shift
+		;;
+    		-d|--deploy)
+                       	CONF="$2"
+			shift
+            	;;	
+		*)
             		echo "Unknown key $key"
     		;;
 		esac
@@ -179,6 +227,10 @@ EXPORT_DIR="/tmp"
 CLONE="subutai-16.04-$(date +%s)"
 
 readArgs "$@"
+
+if [ "$CONF" != "" ]; then
+	deployPeers "$CONF"
+fi
 
 cloneVm "$CLONE"
 waitForSnapd
@@ -202,7 +254,17 @@ setAutobuildIP
 
 ### No manipulation inside VM after this step
 stopVM "$CLONE"
+
+if [ "$EXPORT" == "ova" ]; then
+	exportOvaImg "$CLONE"
+	exit 0
+elif [ "$EXPORT" == "box" ]; then
+	exportBoxImg "$CLONE"
+	exit 0 
+fi
+
 restoreNet "$CLONE"
 startVM "$CLONE"
 waitPeerIP
+
 
