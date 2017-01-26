@@ -24,14 +24,14 @@ function cloneVm() {
         ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:5567
 
         echo "Waiting for ssh"
-        while [ "$(sshpass -p "ubuntai" ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no subutai@localhost -p5567 "ls" > /dev/null 2>&1; echo $?)" != "0" ]; do
+        while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o ConnectTimeout=1 -o StrictHostKeyChecking=no subutai@localhost -p5567 "ls" > /dev/null 2>&1; echo $?)" != "0" ]; do
                 sleep 2
         done
 }
 
 function stopVM() {
 	local vm="$1"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo sync"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo sync"
         echo "Shutting down vm"
         vboxmanage controlvm $vm poweroff
 }
@@ -67,7 +67,7 @@ function restoreNet() {
 
 function btrfsInit() {
 	echo "Initializing Btrfs disk"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo subutai.btrfsinit /dev/sdb"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo subutai.btrfsinit /dev/sdb"
 }
 
 function localSnap() {
@@ -78,26 +78,26 @@ function localSnap() {
 function installLocalSnap() {
 	local snap="$1"
 	echo "Copying local snap to vm"
-	sshpass -p "ubuntai" scp -o StrictHostKeyChecking=no -P5567 $snap subutai@localhost:/tmp
+	sshpass -p "ubuntai" scp -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -P5567 $snap subutai@localhost:/tmp
 	echo "Installing local snap"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --dangerous --devmode /tmp/$snap"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --dangerous --devmode /tmp/$snap"
 }
 
 function installSnapFromStore() {
 	echo "Running installation command"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --beta --devmode subutai"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --beta --devmode subutai"
 }
 
 function waitForSubutai() {
 	echo "Waiting for subutai installation complete"
-	while [ "$(sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
+	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
 		sleep 2
 	done
 }
 
 function waitForSnapd() {
 	echo "Waiting for snapd"
-	while [ "$(sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap info subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
+	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap info subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
 		sleep 2
 	done
 }
@@ -105,7 +105,7 @@ function waitForSnapd() {
 function setAutobuildIP() {
 	local ip=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep -Po 'inet \K[\d.]+')
 	echo "Setting loopback IP $ip"
-        sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $ip > /var/snap/subutai/current/.ip'"
+        sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $ip > /var/snap/subutai/current/.ip'"
 }
 
 function waitPeerIP() {
@@ -118,14 +118,14 @@ function waitPeerIP() {
 function setPeerVlan() {
 	local vlan="$1"
 	echo "Setting vlan $vlan"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $vlan > /var/snap/subutai/current/.vlan'"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $vlan > /var/snap/subutai/current/.vlan'"
 }
 
 function addSshKey() {
 	echo "Adding user key to peer"
 	local key="$(ssh-add -L)"
 	if [ "$key" != "" ]; then
-		sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $key >> /root/.ssh/authorized_keys'"
+		sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $key >> /root/.ssh/authorized_keys'"
 	fi
 }
 
