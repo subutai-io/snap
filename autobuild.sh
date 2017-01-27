@@ -24,14 +24,14 @@ function cloneVm() {
         ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:5567
 
         echo "Waiting for ssh"
-        while [ "$(sshpass -p "ubuntai" ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no subutai@localhost -p5567 "ls" > /dev/null 2>&1; echo $?)" != "0" ]; do
+        while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o ConnectTimeout=1 -o StrictHostKeyChecking=no subutai@localhost -p5567 "ls" > /dev/null 2>&1; echo $?)" != "0" ]; do
                 sleep 2
         done
 }
 
 function stopVM() {
 	local vm="$1"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo sync"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo sync"
         echo "Shutting down vm"
         vboxmanage controlvm $vm poweroff
 }
@@ -67,30 +67,7 @@ function restoreNet() {
 
 function btrfsInit() {
 	echo "Initializing Btrfs disk"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo subutai.btrfsinit /dev/sdb"
-}
-
-function export_ova() {
-	local $clone="$1"
-        echo "Exporting OVA image"
-        mkdir -p "$EXPORT_DIR/ova"
-        vboxmanage export $clone -o $EXPORT_DIR/ova/${clone}.ova --ovf20
-}
-
-function export_box() {
-        mkdir -p "$EXPORT_DIR/vagrant/"
-        local dst="$EXPORT_DIR/vagrant/"
-	local clone="$1"
-
-        echo "Exporting Vagrant box"
-        vagrant init $clone ${clone}.box
-        vagrant package --base $clone --output $dst/${clone}.box
-
-        mv -f Vagrantfile .vagrant $dst
-
-        # inject.vagrant parameters into Vagrantfile
-        sed -e '/# config.vm.network "public_network"/ {' \
-                -e 'r inject.vagrant' -e 'd' -e '}' -i $dst/Vagrantfile
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo subutai.btrfsinit /dev/sdb"
 }
 
 function localSnap() {
@@ -101,26 +78,26 @@ function localSnap() {
 function installLocalSnap() {
 	local snap="$1"
 	echo "Copying local snap to vm"
-	sshpass -p "ubuntai" scp -o StrictHostKeyChecking=no -P5567 $snap subutai@localhost:/tmp
+	sshpass -p "ubuntai" scp -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -P5567 $snap subutai@localhost:/tmp
 	echo "Installing local snap"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --dangerous --devmode /tmp/$snap"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --dangerous --devmode /tmp/$snap"
 }
 
 function installSnapFromStore() {
 	echo "Running installation command"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --beta --devmode subutai"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --beta --devmode subutai"
 }
 
 function waitForSubutai() {
 	echo "Waiting for subutai installation complete"
-	while [ "$(sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
+	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
 		sleep 2
 	done
 }
 
 function waitForSnapd() {
 	echo "Waiting for snapd"
-	while [ "$(sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap info subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
+	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap info subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
 		sleep 2
 	done
 }
@@ -128,7 +105,7 @@ function waitForSnapd() {
 function setAutobuildIP() {
 	local ip=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep -Po 'inet \K[\d.]+')
 	echo "Setting loopback IP $ip"
-        sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $ip > /var/snap/subutai/current/.ip'"
+        sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $ip > /var/snap/subutai/current/.ip'"
 }
 
 function waitPeerIP() {
@@ -141,15 +118,78 @@ function waitPeerIP() {
 function setPeerVlan() {
 	local vlan="$1"
 	echo "Setting vlan $vlan"
-	sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $vlan > /var/snap/subutai/current/.vlan'"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $vlan > /var/snap/subutai/current/.vlan'"
 }
 
 function addSshKey() {
 	echo "Adding user key to peer"
 	local key="$(ssh-add -L)"
 	if [ "$key" != "" ]; then
-		sshpass -p "ubuntai" ssh -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $key >> /root/.ssh/authorized_keys'"
+		sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $key >> /root/.ssh/authorized_keys'"
 	fi
+}
+
+function deployPeers() {
+        local peer=$(grep PEER "$1" | cut -d"=" -f2)
+        local rh=$(grep RH "$1" | cut -d"=" -f2)
+
+        if [ "$peer" == "" ] || [ "$rh" == "" ]; then
+                echo "Invalid config"
+                exit 1
+        fi
+
+        echo "Erecting $peer(x${rh}RH) peer. Please wait"
+
+        local i=0
+        while [ $i -lt $peer ]; do
+                local j=0
+                local vlan=$(shuf -i 1-4096 -n 1)
+                while [ $j -lt $rh ]; do
+                        local mhip=$($0 -t $vlan | grep "root@" | cut -d"@" -f2)
+                        if [ $j -eq 0 ]; then
+                                ssh -o StrictHostKeyChecking=no root@$mhip "sudo subutai import management"
+                                local arr[$i]=$mhip
+                        fi
+                        let "j=j+1"
+                done
+                let "i=i+1"
+        done
+
+        echo -e "\\nManagement IPs: ${arr[*]}"
+	exit 0
+}
+
+function exportOvaImg() {
+	local vm="$1"
+	local dir="../export/ova"
+        echo "Exporting OVA image"
+        mkdir -p "$dir"
+        vboxmanage export $vm -o $dir/${vm}.ova --ovf20
+	vboxmanage unregistervm --delete "$vm"
+	echo "Exported to $dir/${vm}.ova"
+}
+
+function exportBoxImg() {
+	local vm="$1"
+        local dir="../export/vagrant"
+	
+	if [ "$(which vagrant)" == "" ]; then
+		echo "Vagrant is requried to use this option"
+		vboxmanage unregistervm --delete "$vm"
+		exit 1
+	fi
+        echo "Exporting Vagrant box"
+        mkdir -p "$dir"
+        vagrant init $vm ${vm}.box
+        vagrant package --base $vm --output $dir/${vm}.box
+
+        mv -f Vagrantfile .vagrant $dir
+
+        # inject.vagrant parameters into Vagrantfile
+        sed -e '/# config.vm.network "public_network"/ {' \
+                -e 'r inject.vagrant' -e 'd' -e '}' -i $dir/Vagrantfile
+	vboxmanage unregistervm --delete "$vm"
+	echo "Exported to $dir/${vm}.box"
 }
 
 function readArgs() {
@@ -161,7 +201,15 @@ function readArgs() {
     			TAG="$2"
     			shift
     		;;
-    		*)
+		-e|--export)
+			EXPORT="$2"
+			shift
+		;;
+    		-d|--deploy)
+                       	CONF="$2"
+			shift
+            	;;	
+		*)
             		echo "Unknown key $key"
     		;;
 		esac
@@ -179,6 +227,10 @@ EXPORT_DIR="/tmp"
 CLONE="subutai-16.04-$(date +%s)"
 
 readArgs "$@"
+
+if [ "$CONF" != "" ]; then
+	deployPeers "$CONF"
+fi
 
 cloneVm "$CLONE"
 waitForSnapd
@@ -202,7 +254,17 @@ setAutobuildIP
 
 ### No manipulation inside VM after this step
 stopVM "$CLONE"
+
+if [ "$EXPORT" == "ova" ]; then
+	exportOvaImg "$CLONE"
+	exit 0
+elif [ "$EXPORT" == "box" ]; then
+	exportBoxImg "$CLONE"
+	exit 0 
+fi
+
 restoreNet "$CLONE"
 startVM "$CLONE"
 waitPeerIP
+
 

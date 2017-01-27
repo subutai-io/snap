@@ -15,8 +15,8 @@ server {
     server_name DOMAIN;
 
     ssl on;
-    ssl_certificate /var/lib/apps/subutai/current/web/ssl/UNIXDATE.crt;
-    ssl_certificate_key /var/lib/apps/subutai/current/web/ssl/UNIXDATE.key;
+    ssl_certificate /var/snap/subutai/current/web/ssl/UNIXDATE.crt;
+    ssl_certificate_key /var/snap/subutai/current/web/ssl/UNIXDATE.key;
 
     error_page 497	https://$host$request_uri;
 
