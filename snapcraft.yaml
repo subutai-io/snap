@@ -91,6 +91,7 @@ parts:
                         - libnih-dev
                         - libnih-dbus-dev
                         - libpam0g-dev
+                        - nih-dbus-tool
                 organize:
                         sbin: bin
                 snap:
@@ -101,7 +102,10 @@ parts:
                 plugin: autotools
                 source: https://github.com/protobuf-c/protobuf-c.git
                 build-packages:
-                        - libprotoc-dev 
+                        - libprotoc-dev
+                        - g++
+                        - libprotobuf-dev
+                        - protobuf-compiler
                 snap:
                         - lib
         #criu:
