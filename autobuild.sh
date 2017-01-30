@@ -125,7 +125,7 @@ function addSshKey() {
 	echo "Adding user key to peer"
 	local key="$(ssh-add -L)"
 	if [ "$key" != "" ]; then
-		sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $key >> /root/.ssh/authorized_keys'"
+		sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo "$key" >> /root/.ssh/authorized_keys'"
 	fi
 }
 
