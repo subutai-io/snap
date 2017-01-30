@@ -2,11 +2,6 @@
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
-MNG_VLAN=2
-if [ -f "$SUBUTAI_DATA_PREFIX/.vlan" ]; then
-        MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/.vlan)"
-fi
-
 mkdir -p /var/run/openvswitch/
 mkdir -p $SUBUTAI_DATA_PREFIX/subutai-network/
 
@@ -17,18 +12,9 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	ovs-vsctl --may-exist add-br wan
 done
 
-#cat <<EOF > $SUBUTAI_SYS_ETC/network/interfaces.d/$DEF_NIC
-#allow-hotplug $DEF_NIC
-#iface $DEF_NIC inet manual
-#EOF
-
-ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
-ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
-ovs-vsctl set port mng-net tag=$MNG_VLAN
-
 ovs-vsctl --may-exist add-br lxc-br
 ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal
-ifconfig nat 10.10.0.254/24
+ifconfig nat 10.10.10.254/24
 
 iptables -t nat -A POSTROUTING -j MASQUERADE
 iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-fill
@@ -63,11 +49,6 @@ while true; do
 		fi
 	fi 
 
-
-	if [ "$(ifconfig mng-net | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')" != "10.10.10.254" ]; then
-		timeout 10 dhclient mng-net
-	fi
-
 	sleep 20
-	ps aux | egrep "dhclient $DEF_NIC|dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
+	ps aux | egrep "dhclient $DEF_NIC|dhclient eth|dhclient wan" | awk '{print $2}' | xargs kill
 done
