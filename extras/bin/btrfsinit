@@ -12,19 +12,19 @@ Description = BTRFS mount
 
 [Mount]
 What = $1
-Where = /var/snap/subutai/common/lxc 
+Where = /var/snap/$SUBUTAI_APP_TYPE/common/lxc 
 Type = btrfs
 
 [Install]
-WantedBy = multi-user.target" > $SUBUTAI_SYS_ETC/systemd/system/var-snap-subutai-common-lxc.mount
+WantedBy = multi-user.target" > $SUBUTAI_SYS_ETC/systemd/system/var-snap-$SUBUTAI_APP_TYPE-common-lxc.mount
 
 systemctl daemon-reload
-systemctl start var-snap-subutai-common-lxc.mount
-systemctl enable var-snap-subutai-common-lxc.mount
+systemctl start var-snap-$SUBUTAI_APP_TYPE-common-lxc.mount
+systemctl enable var-snap-$SUBUTAI_APP_TYPE-common-lxc.mount
 
-mkdir -p /var/snap/subutai/common/lxc/tmpdir
+mkdir -p /var/snap/$SUBUTAI_APP_TYPE/common/lxc/tmpdir
 
-$SUBUTAI_APP_PREFIX/bin/btrfs quota enable /var/snap/subutai/common/lxc/tmpdir
+$SUBUTAI_APP_PREFIX/bin/btrfs quota enable /var/snap/$SUBUTAI_APP_TYPE/common/lxc/tmpdir
 
 echo -e "\nif [ -f /snap/subutai/current/etc/bash_completion ]; then . /snap/subutai/current/etc/bash_completion; fi" >> /root/.bashrc 
 if [ -d /home/subutai ]; then
