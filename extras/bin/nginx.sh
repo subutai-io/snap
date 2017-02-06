@@ -2,7 +2,7 @@
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
-mkdir -p /var/snap/subutai/common/cache/nginx/
+mkdir -p /var/snap/$SUBUTAI_APP_TYPE/common/cache/nginx/
 mkdir -p $SUBUTAI_DATA_PREFIX/nginx/cache/
 mkdir -p $SUBUTAI_DATA_PREFIX/nginx/log/
 mkdir -p $SUBUTAI_DATA_PREFIX/nginx/run/

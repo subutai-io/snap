@@ -26,7 +26,7 @@ mkdir -p /var/snap/$SUBUTAI_APP_TYPE/common/lxc/tmpdir
 
 $SUBUTAI_APP_PREFIX/bin/btrfs quota enable /var/snap/$SUBUTAI_APP_TYPE/common/lxc/tmpdir
 
-echo -e "\nif [ -f /snap/subutai/current/etc/bash_completion ]; then . /snap/subutai/current/etc/bash_completion; fi" >> /root/.bashrc 
+echo -e "\nif [ -f /snap/$SUBUTAI_APP_TYPE/current/etc/bash_completion ]; then . /snap/$SUBUTAI_APP_TYPE/current/etc/bash_completion; fi" >> /root/.bashrc 
 if [ -d /home/subutai ]; then
-	echo -e "\nif [ -f /snap/subutai/current/etc/bash_completion ]; then . /snap/subutai/current/etc/bash_completion; fi" >> /home/subutai/.bashrc 
+	echo -e "\nif [ -f /snap/$SUBUTAI_APP_TYPE/current/etc/bash_completion ]; then . /snap/$SUBUTAI_APP_TYPE/current/etc/bash_completion; fi" >> /home/subutai/.bashrc 
 fi
