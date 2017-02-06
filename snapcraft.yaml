@@ -7,6 +7,7 @@ description: "For more details please visit our site: https://subut.ai"
 apps:
         subutai:
                 command: bin/subutai
+                aliases: [subutai]
         p2p:
                 command: bin/p2p
         btrfsinit:
@@ -48,10 +49,9 @@ apps:
 parts:
         wrappers:
                 plugin: dump 
-                #source: https://github.com/subutai-io/snap.git 
-                source: /home/ubuntu/snappy/snap/
+                source: https://github.com/subutai-io/snap.git 
                 source-subdir: extras
-                #source-branch: dev
+                source-branch: dev
         ovs:
                 plugin: autotools
                 source: https://github.com/openvswitch/ovs.git 
