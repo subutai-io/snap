@@ -6,6 +6,7 @@
 # autobuild script during build first tries to use local snap if it is present, if it is not exist, autobuild just install snap from Store (inet is needed)
 # if snap is not exist and Store is not reachable, then we warn user about it with recommendations to install snapcraft and build snap manualy 
 
+subutai="subutai"
 
 function cloneVm() {
 	local clone="$1"
@@ -67,11 +68,11 @@ function restoreNet() {
 
 function btrfsInit() {
 	echo "Initializing Btrfs disk"
-	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo subutai.btrfsinit /dev/sdb"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo $subutai.btrfsinit /dev/sdb"
 }
 
 function localSnap() {
-	local snap="$(ls subutai*.snap 2>/dev/null | tail -1)"
+	local snap="$(ls $subutai*.snap 2>/dev/null | tail -1)"
 	echo $snap
 }
 
@@ -85,12 +86,12 @@ function installLocalSnap() {
 
 function installSnapFromStore() {
 	echo "Running installation command"
-	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --beta --devmode subutai"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --beta --devmode $subutai"
 }
 
 function waitForSubutai() {
-	echo "Waiting for subutai installation complete"
-	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
+	echo "Waiting for $subutai installation complete"
+	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list $subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
 		sleep 2
 	done
 }
@@ -105,7 +106,7 @@ function waitForSnapd() {
 function setAutobuildIP() {
 	local ip=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep -Po 'inet \K[\d.]+')
 	echo "Setting loopback IP $ip"
-        sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $ip > /var/snap/subutai/current/.ip'"
+        sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $ip > /var/snap/$subutai/current/.ip'"
 }
 
 function waitPeerIP() {
@@ -118,7 +119,7 @@ function waitPeerIP() {
 function setPeerVlan() {
 	local vlan="$1"
 	echo "Setting vlan $vlan"
-	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $vlan > /var/snap/subutai/current/.vlan'"
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $vlan > /var/snap/$subutai/current/.vlan'"
 }
 
 function addSshKey() {
@@ -147,7 +148,7 @@ function deployPeers() {
                 while [ $j -lt $rh ]; do
                         local mhip=$($0 -t $vlan | grep "root@" | cut -d"@" -f2)
                         if [ $j -eq 0 ]; then
-                                ssh -o StrictHostKeyChecking=no root@$mhip "sudo subutai import management"
+                                ssh -o StrictHostKeyChecking=no root@$mhip "sudo $subutai import management"
                                 local arr[$i]=$mhip
                         fi
                         let "j=j+1"

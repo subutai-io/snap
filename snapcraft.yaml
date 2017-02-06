@@ -7,7 +7,6 @@ description: "For more details please visit our site: https://subut.ai"
 apps:
         subutai:
                 command: bin/subutai
-                aliases: [subutai]
         p2p:
                 command: bin/p2p
         btrfsinit:
@@ -28,7 +27,7 @@ apps:
                 command: bin/rngd -f -r /dev/urandom
                 daemon: simple
         p2p-service:
-                command: bin/p2p daemon -save /var/snap/$SNAP_NAME/current/p2p.save
+                command: bin/p2p daemon -save $SNAP_DATA/p2p.save
                 daemon: simple
         dns-service:
                 command: bin/dnsmasq -k --address=/gw.intra.lan/10.10.10.1
@@ -49,9 +48,10 @@ apps:
 parts:
         wrappers:
                 plugin: dump 
-                source: https://github.com/subutai-io/snap.git 
+                #source: https://github.com/subutai-io/snap.git 
+                source: /home/ubuntu/snappy/snap/
                 source-subdir: extras
-                source-branch: dev
+                #source-branch: dev
         ovs:
                 plugin: autotools
                 source: https://github.com/openvswitch/ovs.git 
@@ -79,12 +79,6 @@ parts:
                         - bin/btrfsck  
                         - bin/mkfs.btrfs 
                         - -include
-        #curl:
-        #        plugin: autotools
-        #        source: https://github.com/curl/curl.git
-        #        snap:
-        #                - bin/curl
-        #                - -include
         cgmanager:
                 plugin: autotools
                 source: git://github.com/lxc/cgmanager
@@ -140,13 +134,15 @@ parts:
                         - -usr/local/share
         lxc:
                 plugin: autotools
-                configflags: ["--datadir=/snap/subutai/current/share", "--with-config-path=/var/snap/subutai/common/lxc"]
+                configflags: ["--datadir=/snap/$SNAPCRAFT_PROJECT_NAME/current/share", "--with-config-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/common/lxc"]
                 source: https://github.com/lxc/lxc.git
                 build-packages:
                         - pkg-config
                         - libcap-dev
                 organize:
                         snap/subutai/current/share: share 
+                        snap/subutai-dev/current/share: share
+                        snap/subutai-master/current/share: share
                         sbin: bin
                 snap:
                         - etc/default
@@ -203,7 +199,7 @@ parts:
                 build-packages:
                         - libpcre3-dev 
                         - libssl-dev
-                configflags: ["--conf-path=/snap/$SNAP_NAME/current/etc/nginx/nginx.conf", "--error-log-path=/var/snap/$SNAP_NAME/current/nginx/log/error.log", "--http-log-path=/var/snap/$SNAP_NAME/current/nginx/log/access.log", "--pid-path=/var/snap/$SNAP_NAME/current/nginx/run/nginx.pid", "--lock-path=/var/snap/$SNAP_NAME/current/nginx/run/nginx.lock", "--http-client-body-temp-path=/var/snap/$SNAP_NAME/current/nginx/cache/client_temp", "--http-proxy-temp-path=/var/snap/$SNAP_NAME/current/nginx/cache/proxy_temp", "--http-fastcgi-temp-path=/var/snap/$SNAP_NAME/current/nginx/cache/fastcgi_temp", "--http-uwsgi-temp-path=/var/snap/$SNAP_NAME/current/nginx/cache/uwsgi_temp", "--http-scgi-temp-path=/var/snap/$SNAP_NAME/current/nginx/cache/scgi_temp", "--with-http_ssl_module", "--with-http_realip_module", "--with-http_addition_module", "--with-http_sub_module", "--with-http_dav_module", "--with-http_flv_module", "--with-http_mp4_module", "--with-http_gunzip_module", "--with-http_gzip_static_module", "--with-http_random_index_module", "--with-http_secure_link_module", "--with-http_stub_status_module", "--with-http_auth_request_module", "--with-threads", "--with-stream", "--with-stream_ssl_module", "--with-http_slice_module", "--with-mail", "--with-mail_ssl_module", "--with-file-aio", "--with-http_v2_module", "--with-ipv6"]
+                configflags: ["--conf-path=/snap/$SNAPCRAFT_PROJECT_NAME/current/etc/nginx/nginx.conf", "--error-log-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/log/error.log", "--http-log-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/log/access.log", "--pid-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/run/nginx.pid", "--lock-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/run/nginx.lock", "--http-client-body-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/client_temp", "--http-proxy-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/proxy_temp", "--http-fastcgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/fastcgi_temp", "--http-uwsgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/uwsgi_temp", "--http-scgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/scgi_temp", "--with-http_ssl_module", "--with-http_realip_module", "--with-http_addition_module", "--with-http_sub_module", "--with-http_dav_module", "--with-http_flv_module", "--with-http_mp4_module", "--with-http_gunzip_module", "--with-http_gzip_static_module", "--with-http_random_index_module", "--with-http_secure_link_module", "--with-http_stub_status_module", "--with-http_auth_request_module", "--with-threads", "--with-stream", "--with-stream_ssl_module", "--with-http_slice_module", "--with-mail", "--with-mail_ssl_module", "--with-file-aio", "--with-http_v2_module", "--with-ipv6"]
                 organize:
                         sbin: bin
                 snap:
