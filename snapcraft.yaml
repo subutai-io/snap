@@ -49,9 +49,7 @@ apps:
 parts:
         wrappers:
                 plugin: dump 
-                source: https://github.com/subutai-io/snap.git 
-                source-subdir: extras
-                source-branch: dev
+                source: ./extras
         ovs:
                 plugin: autotools
                 source: https://github.com/openvswitch/ovs.git 
