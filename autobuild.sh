@@ -84,8 +84,7 @@ function btrfsInit() {
 }
 
 function localSnap() {
-	local snap="$(ls ${SUBUTAI}_*.snap 2>/dev/null | tail -1)"
-	echo $snap
+	echo "$(ls ${SUBUTAI}_*.snap 2>/dev/null | tail -1)"
 }
 
 function installLocalSnap() {

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+declare -A BRANCH
+BRANCH[tag]="subutai"
+BRANCH[master]="subutai-stage"
+BRANCH[dev]="subutai-dev"
+
+function subutai() {
+        if [ "$1" != "" ]; then
+                echo ${BRANCH[$1]}
+        else
+                echo ${BRANCH[tag]}
+        fi
+}
+
+branch="$(git rev-parse --abbrev-ref HEAD | grep -iv head)"
+
+cp snapcraft.yaml.templ snapcraft.yaml
+sed -e "s/(BRANCH)/$branch/g" -i snapcraft.yaml
+sed -e "s/(SUBUTAI)/$(subutai $branch)/g" -i snapcraft.yaml

@@ -1,11 +1,11 @@
-name: subutai
-version: "4.0.14-SNAPSHOT"
+name: (SUBUTAI)
+version: "4.0.14-(BRANCH)"
 confinement: devmode
 summary: Open Source LXC orchestration tool
 description: "For more details please visit our site: https://subut.ai"
 
 apps:
-        subutai:
+        (SUBUTAI):
                 command: bin/subutai
                 aliases: [subutai]
         p2p:
@@ -158,7 +158,7 @@ parts:
                 plugin: make
                 make-parameters: [--always-make, snapcraft]
                 source: https://github.com/subutai-io/p2p.git 
-                source-branch: dev
+                source-branch: (BRANCH)
                 build-packages:
                         - golang
                 organize:
@@ -175,7 +175,7 @@ parts:
         subutai:
                 plugin: make
                 source: https://github.com/subutai-io/agent.git 
-                source-branch: dev
+                source-branch: (BRANCH)
                 make-parameters: [snapcraft]
                 build-packages:
                         - lxc-dev
