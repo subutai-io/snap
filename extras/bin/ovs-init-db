@@ -1,14 +1,11 @@
 #!/bin/bash
 
-#Include enviroment variables
-. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
-
 mkdir -p /var/run/openvswitch/
 
 modprobe openvswitch
 modprobe iptable_nat
 
-echo -e "openvswitch\niptable_nat" > $SUBUTAI_SYS_ETC/modules-load.d/subutai.conf
+echo -e "openvswitch\niptable_nat" > /writable/system-data/etc/modules-load.d/subutai.conf
 
 while [ $(lsmod | grep -c 'openvswitch\|iptable_nat') -lt 7 ]; do
 	echo "Unable to load openvswitch or iptable_nat kernel module. Please load module manually"
@@ -22,21 +19,21 @@ if [ "$(hostnamectl | grep -c gw.intra.lan)" == "0" ]; then
 	hostnamectl set-hostname "rh`date +%s`.gw.intra.lan"
 fi
 
-while [ ! -f $SUBUTAI_APP_PREFIX/share/openvswitch/vswitch.ovsschema ]; do
+while [ ! -f $SNAP/share/openvswitch/vswitch.ovsschema ]; do
         sleep 1
 done
 
-if [ -f $SUBUTAI_DATA_PREFIX/ovs/conf.db ]; then
+if [ -f $SNAP_DATA/ovs/conf.db ]; then
     echo "conf.db is already exist, skipping"
 else
     echo "applying vswitch.ovsschema"
-    mkdir -p $SUBUTAI_DATA_PREFIX/ovs
-    $SUBUTAI_APP_PREFIX/bin/ovsdb-tool create $SUBUTAI_DATA_PREFIX/ovs/conf.db $SUBUTAI_APP_PREFIX/share/openvswitch/vswitch.ovsschema
+    mkdir -p $SNAP_DATA/ovs
+    $SNAP/bin/ovsdb-tool create $SNAP_DATA/ovs/conf.db $SNAP/share/openvswitch/vswitch.ovsschema
 fi
 mkdir -p /var/run/openvswitch
 if [ -f "/var/run/openvswitch/db.sock" ]; then
     echo "db.sock is already exist, skipping"
 else
     echo "starting ovsdb-server"
-    $SUBUTAI_APP_PREFIX/bin/ovsdb-server --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --pidfile=/var/run/openvswitch/db.pid --unixct=/var/run/openvswitch/ovsdb.ctl $SUBUTAI_DATA_PREFIX/ovs/conf.db
+    $SNAP/bin/ovsdb-server --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --pidfile=/var/run/openvswitch/db.pid --unixct=/var/run/openvswitch/ovsdb.ctl $SNAP_DATA/ovs/conf.db
 fi

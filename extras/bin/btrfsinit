@@ -1,30 +1,31 @@
 #!/bin/bash
 
-#Include enviroment variables
-. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
-
 umount $1
 
 mkfs.btrfs -f $1
+
+UNIT="var-snap-$(echo ${SNAP_NAME} | sed -e "s/-/\\\x2d/g")-common-lxc.mount"
 
 echo "[Unit]
 Description = BTRFS mount
 
 [Mount]
 What = $1
-Where = /var/snap/subutai/common/lxc 
+Where = /var/snap/$SNAP_NAME/common/lxc
 Type = btrfs
 
 [Install]
-WantedBy = multi-user.target" > $SUBUTAI_SYS_ETC/systemd/system/var-snap-subutai-common-lxc.mount
+WantedBy = multi-user.target" > /writable/system-data/etc/systemd/system/$UNIT
 
 systemctl daemon-reload
-systemctl start var-snap-subutai-common-lxc.mount
-systemctl enable var-snap-subutai-common-lxc.mount
+systemctl start $UNIT
+systemctl enable $UNIT
 
-mkdir -p /var/snap/subutai/common/lxc/tmpdir
+mkdir -p $SNAP_DATA/../common/lxc/tmpdir
 
-$SUBUTAI_APP_PREFIX/bin/btrfs quota enable /var/snap/subutai/common/lxc/tmpdir
+$SNAP/bin/btrfs quota enable $SNAP_DATA/../common/lxc/tmpdir
 
-echo -e "\nif [ -f /snap/subutai/current/etc/bash_completion ]; then . /snap/subutai/current/etc/bash_completion; fi" >> /root/.bashrc 
-echo -e "\nif [ -f /snap/subutai/current/etc/bash_completion ]; then . /snap/subutai/current/etc/bash_completion; fi" >> /home/subutai/.bashrc 
+echo -e "\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /root/.bashrc
+if [ -d /home/subutai ]; then
+	echo -e "\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /home/subutai/.bashrc
+fi

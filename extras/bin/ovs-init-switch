@@ -1,11 +1,7 @@
 #!/bin/bash
-
-#Include enviroment variables
-. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
-
 mkdir -p /var/run/openvswitch/
 
-while [ ! -f $SUBUTAI_APP_PREFIX/bin/ovs-vswitchd ]; do
+while [ ! -f $SNAP/bin/ovs-vswitchd ]; do
 	sleep 1
 done
 
@@ -24,4 +20,4 @@ if [ -f "/var/run/openvswitch/vswitchd.pid" ]; then
     fi
 fi
 
-$SUBUTAI_APP_PREFIX/bin/ovs-vswitchd --pidfile=/var/run/openvswitch/vswitchd.pid --unixctl=/var/run/openvswitch/vswitch.ctl unix:/var/run/openvswitch/db.sock
+$SNAP/bin/ovs-vswitchd --pidfile=/var/run/openvswitch/vswitchd.pid --unixctl=/var/run/openvswitch/vswitch.ctl unix:/var/run/openvswitch/db.sock

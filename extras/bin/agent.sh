@@ -1,9 +1,9 @@
 #!/bin/bash
-#Include enviroment variables
-. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+cp $SNAP/etc/ssh.pem $SNAP_DATA
+chmod 600 $SNAP_DATA/ssh.pem
 
 while [ ! -S /sys/fs/cgroup/cgmanager/sock ]; do
 	sleep 1
 done
 
-exec $SUBUTAI_APP_PREFIX/bin/subutai daemon
+exec $SNAP/bin/subutai daemon
