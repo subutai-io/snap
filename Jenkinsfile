@@ -39,7 +39,7 @@ try {
     stage("Upload to Ubuntu Store")
     notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
     sh """
-      snapcraft push \$(ls subutai_*_amd64.snap) --release beta
+      snapcraft push \$(ls subutai-*_amd64.snap) --release beta
     """
   }
 } catch (e) { 
