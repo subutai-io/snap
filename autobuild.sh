@@ -6,17 +6,12 @@
 # autobuild script during build first tries to use local snap if it is present, if it is not exist, autobuild just install snap from Store (inet is needed)
 # if snap is not exist and Store is not reachable, then we warn user about it with recommendations to install snapcraft and build snap manualy 
 
-declare -A BRANCH
-BRANCH[tag]="subutai"
-BRANCH[master]="subutai-stage"
-BRANCH[dev]="subutai-dev"
-
 function getBranch() {
 	local head=$(git rev-parse --abbrev-ref HEAD | grep -iv head)
 	if [ "$head" != "" ]; then
-		echo ${BRANCH[$head]}
+		echo "subutai-$head"
 	else
-		echo ${BRANCH[tag]}
+		echo "subutai"
 	fi
 }
 
