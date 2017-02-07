@@ -94,6 +94,7 @@ function waitForSubutai() {
 	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list $subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
 		sleep 2
 	done
+	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo install -D /dev/null /writable/system-data/var/lib/console-conf/complete"
 }
 
 function waitForSnapd() {
