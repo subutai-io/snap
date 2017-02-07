@@ -19,7 +19,7 @@ try {
     stage("Generate snapcraft.yaml")
 
     switch (env.BRANCH_NAME) {
-      case ~/master/: snapAppName = "subutai-stage"; break;
+      case ~/master/: snapAppName = "subutai-master"; break;
       case ~/dev/: snapAppName = "subutai-dev"; break;
       default: assert false
     }    
@@ -39,7 +39,7 @@ try {
     stage("Upload to Ubuntu Store")
     notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
     sh """
-      snapcraft push \$(ls subutai-*_amd64.snap) --release beta
+      snapcraft push \$(ls ${snapAppName}*_amd64.snap) --release beta
     """
   }
 } catch (e) { 
