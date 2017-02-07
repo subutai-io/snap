@@ -3,6 +3,7 @@
 import groovy.json.JsonSlurperClassic
 
 notifyBuildDetails = ""
+snapAppName = ""
 
 try {
   notifyBuild('STARTED')
@@ -15,6 +16,20 @@ try {
 
     checkout scm
 
+    stage("Generate snapcraft.yaml")
+
+    switch (env.BRANCH_NAME) {
+      case ~/master/: snapAppName = "subutai-stage"; break;
+      case ~/dev/: snapAppName = "subutai-dev"; break;
+      default: assert false
+    }    
+
+    sh """
+    cp snapcraft.yaml.templ snapcraft.yaml
+    sed -e 's/(BRANCH)/${env.BRANCH_NAME}/g' -i snapcraft.yaml
+    sed -e 's/(SUBUTAI)/${snapAppName}/g' -i snapcraft.yaml
+    """
+
     stage("Build snap")
     notifyBuildDetails = "\nFailed on Stage - Build snap"
     sh """
@@ -24,7 +39,7 @@ try {
     stage("Upload to Ubuntu Store")
     notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
     sh """
-      snapcraft push \$(ls subutai_*_amd64.snap) --release beta
+      snapcraft push \$(ls subutai-*_amd64.snap) --release beta
     """
   }
 } catch (e) { 
@@ -43,7 +58,7 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '') {
   // Default values
   def colorName = 'RED'
   def colorCode = '#FF0000'
-  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"  	
+  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"   
   def summary = "${subject} (${env.BUILD_URL})"
 
   // Override default values based on build status
@@ -56,7 +71,7 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '') {
   } else {
     color = 'RED'
     colorCode = '#FF0000'
-	summary = "${subject} (${env.BUILD_URL})${details}"
+  summary = "${subject} (${env.BUILD_URL})${details}"
   }
   // Get token
   def slackToken = getSlackToken('sysnet-bots-slack-token')
@@ -67,15 +82,15 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '') {
 // get slack token from global jenkins credentials store
 @NonCPS
 def getSlackToken(String slackCredentialsId){
-	// id is ID of creadentials
-	def jenkins_creds = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0]
+  // id is ID of creadentials
+  def jenkins_creds = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0]
 
-	String found_slack_token = jenkins_creds.getStore().getDomains().findResult { domain ->
-	  jenkins_creds.getCredentials(domain).findResult { credential ->
-	    if(slackCredentialsId.equals(credential.id)) {
-	      credential.getSecret()
-	    }
-	  }
-	}
-	return found_slack_token
+  String found_slack_token = jenkins_creds.getStore().getDomains().findResult { domain ->
+    jenkins_creds.getCredentials(domain).findResult { credential ->
+      if(slackCredentialsId.equals(credential.id)) {
+        credential.getSecret()
+      }
+    }
+  }
+  return found_slack_token
 }
