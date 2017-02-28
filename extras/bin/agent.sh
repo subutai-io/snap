@@ -2,6 +2,8 @@
 cp $SNAP/etc/ssh.pem $SNAP_DATA
 chmod 600 $SNAP_DATA/ssh.pem
 
+resize2fs /dev/sda3
+
 if [ ! -f $SNAP_DATA/agent.gcfg ]; then
 	BRANCH=$(echo ${SNAP_NAME#subutai} | tr -d '-')
 	sed -e "s|branch = dev|branch = $BRANCH|g" $SNAP/etc/agent.gcfg > $SNAP_DATA/agent.gcfg
