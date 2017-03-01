@@ -1,0 +1,11 @@
+stream {
+    upstream udp-PORT {
+    	#Add new host here
+	server localhost:81;
+    }
+
+    server {
+        listen PORT udp;
+        proxy_pass udp-PORT;
+    }
+}

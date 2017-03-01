@@ -1,5 +1,5 @@
 #!/bin/bash
-while [ "`ifconfig | grep '10.10.0.254' | wc -l`" -eq "0" ]; do
+while [ "`ifconfig | grep '10.10.10.254' | wc -l`" -eq "0" ]; do
         sleep 1
 done
 	  
