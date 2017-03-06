@@ -70,7 +70,7 @@ function restoreNet() {
         vboxmanage modifyvm $clone --nic2 nat
         vboxmanage modifyvm $clone --natpf2 "ssh-fwd,tcp,,4567,,22"
         vboxmanage modifyvm $clone --nic1 bridged
-        vboxmanage modifyvm $clone --bridgeadapter1 $(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')
+        vboxmanage modifyvm $clone --bridgeadapter1 $(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}' | head -n1)
 }
 
 function btrfsInit() {
@@ -111,7 +111,7 @@ function waitForSnapd() {
 }
 
 function setAutobuildIP() {
-	local ip=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep -Po 'inet \K[\d.]+')
+	local ip=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}' | head -n1` | grep -Po 'inet \K[\d.]+')
 	echo "Setting loopback IP $ip"
         sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo bash -c 'echo $ip > /var/snap/$SUBUTAI/current/.ip'"
 }
