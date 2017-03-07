@@ -30,4 +30,7 @@ _subutai()
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 }
 complete -F _subutai subutai
-
+alias subutai=`snap list | grep subutai | awk '{print $1}'`
+alias subutai.btrfsinit=`snap list | grep subutai | awk '{print $1}'`.btrfsinit
+alias subutai.p2p=`snap list | grep subutai | awk '{print $1}'`.p2p
+alias p2p=`snap list | grep subutai | awk '{print $1}'`.p2p
