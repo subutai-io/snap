@@ -26,6 +26,5 @@ mkdir -p $SNAP_DATA/../common/lxc/tmpdir
 $SNAP/bin/btrfs quota enable $SNAP_DATA/../common/lxc/tmpdir
 
 echo -e "\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /root/.bashrc
-if [ -d /home/subutai ]; then
-	echo -e "\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /home/subutai/.bashrc
-fi
+if [ -d /home/subutai ]; then echo -e "\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /home/subutai/.bashrc; fi
+if [ -d /home/ubuntu ]; then echo -e "\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /home/ubuntu/.bashrc; fi
