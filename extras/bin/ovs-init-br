@@ -2,7 +2,7 @@
 mkdir -p /var/run/openvswitch/
 mkdir -p $SNAP_DATA/subutai-network/
 
-DEF_NIC=$(route | grep '^default' | grep -o '[^ ]*$')
+DEF_NIC=$(route | grep '^default' | grep -m1 -o '[^ ]*$')
 
 while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	sleep 1
@@ -32,7 +32,7 @@ while true; do
 		ifconfig eth1 0
 	fi
 
-	if [ "$(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')" != "wan" ]; then
+	if [ "$(/sbin/route -n | grep -m1 ^0.0.0.0 | awk '{print $8}')" != "wan" ]; then
 		ip route del 0/0
 	fi
 	timeout 20 dhclient wan
