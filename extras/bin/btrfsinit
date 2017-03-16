@@ -28,3 +28,7 @@ $SNAP/bin/btrfs quota enable $SNAP_DATA/../common/lxc/tmpdir
 echo -e "\nalias sudo='sudo '\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /root/.bashrc
 if [ -d /home/subutai ]; then echo -e "\nalias sudo='sudo '\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /home/subutai/.bashrc; fi
 if [ -d /home/ubuntu ]; then echo -e "\nalias sudo='sudo '\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /home/ubuntu/.bashrc; fi
+
+if [ "$(hostnamectl | grep -c gw.intra.lan)" == "0" ]; then
+	hostnamectl set-hostname "rh`date +%s`.gw.intra.lan"
+fi
