@@ -35,12 +35,75 @@ try {
     sh """
       snapcraft
     """
+    stash includes: "subutai-*_amd64.snap", name: 'snap'
+  }
 
-    stage("Upload to Ubuntu Store")
-    notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
-    sh """
-      snapcraft push \$(ls ${snapAppName}*_amd64.snap) --release beta
-    """
+  node() {
+  // Start Test-Peer Lock
+  if (env.BRANCH_NAME == 'dev') {
+    lock('test-node-core16') {
+      // destroy existing management template on test node and install latest available snap
+      sh """
+        set +x
+        scp \$(ls ${snapAppName}*_amd64.snap) root@{env.SS_TEST_NODE_CORE16}:/tmp/subutai-dev-latest.snap
+        ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
+        set -e
+        subutai-dev destroy everything
+        if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
+        find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
+        cd /tmp
+        find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
+        snap install --dangerous --devmode /tmp/subutai-dev-latest.snap
+      EOF"""
+
+      // install generated management template
+      sh """
+        set +x
+        ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
+        set -e
+        echo y | subutai-dev import management
+      EOF"""
+
+      /* wait until SS starts */
+      timeout(time: 5, unit: 'MINUTES') {
+        sh """
+          set +x
+          echo "Waiting SS"
+          while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE_CORE16}:8443/rest/v1/peer/ready') != "200" ]; do
+            sleep 5
+          done
+        """
+      }
+
+      stage("Integration tests")
+      deleteDir()
+
+      // Run Serenity Tests
+      notifyBuildDetails = "\nFailed on Stage - Integration tests\nSerenity Tests Results:\n${env.JENKINS_URL}serenity/${commitId}"
+
+      git url: "https://github.com/subutai-io/playbooks.git"
+      sh """
+        set +e
+        ./run_tests_qa.sh -m ${env.SS_TEST_NODE_CORE16}
+        ./run_tests_qa.sh -s all
+        ${mvnHome}/bin/mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
+        OUT=\$?
+        ${mvnHome}/bin/mvn serenity:aggregate
+        cp -rl target/site/serenity ${serenityReportDir}
+        if [ \$OUT -ne 0 ];then
+          exit 1
+        fi
+      """
+    }
+  }
+
+  stage("Upload to Ubuntu Store")
+  unstash "snap"
+
+  notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
+  sh """
+    snapcraft push \$(ls ${snapAppName}*_amd64.snap) --release beta
+  """
   }
 } catch (e) { 
   currentBuild.result = "FAILED"
