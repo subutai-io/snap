@@ -47,7 +47,7 @@ try {
 
       sh """
         set +x
-        scp \$(ls ${snapAppName}*_amd64.snap) root@{env.SS_TEST_NODE_CORE16}:/tmp/subutai-dev-latest.snap
+        scp \$(ls ${snapAppName}*_amd64.snap) root@${env.SS_TEST_NODE_CORE16}:/tmp/subutai-dev-latest.snap
         ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
         set -e
         subutai-dev destroy everything
