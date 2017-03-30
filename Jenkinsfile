@@ -5,6 +5,8 @@ import groovy.json.JsonSlurperClassic
 notifyBuildDetails = ""
 snapAppName = ""
 
+def mvnHome = tool 'M3'
+
 try {
 	notifyBuild('STARTED')
 	node("snapcraft") {
