@@ -52,6 +52,7 @@ try {
 			sh """
 				set +x
 				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
+				set -e
 				subutai-dev destroy everything
 				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
 				find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
@@ -79,7 +80,7 @@ try {
 			}
 
 			stage("Integration tests")
-			deleteDir()
+			// deleteDir()
 
 			// Run Serenity Tests
 			notifyBuildDetails = "\nFailed on Stage - Integration tests\nSerenity Tests Results:\n${env.JENKINS_URL}serenity/${commitId}"
