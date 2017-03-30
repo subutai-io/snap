@@ -5,8 +5,6 @@ import groovy.json.JsonSlurperClassic
 notifyBuildDetails = ""
 snapAppName = ""
 
-def mvnHome = tool 'M3'
-
 try {
 	notifyBuild('STARTED')
 	node("snapcraft") {
@@ -82,7 +80,9 @@ try {
 			}
 
 			stage("Integration tests")
-			// deleteDir()
+			deleteDir()
+
+			def mvnHome = tool 'M3'
 
 			// Run Serenity Tests
 			notifyBuildDetails = "\nFailed on Stage - Integration tests\nSerenity Tests Results:\n${env.JENKINS_URL}serenity/${commitId}"
