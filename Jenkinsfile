@@ -47,12 +47,13 @@ try {
 	// Start Test-Peer Lock
 	if (env.BRANCH_NAME == 'dev') {
 		lock('test-node-core16') {
-			// destroy existing management template on test node and install latest available snap
+			unstash "snap"
 
 			sh """
 				scp \$(ls ${snapAppName}*_amd64.snap) root@${env.SS_TEST_NODE_CORE16}:/tmp/subutai-dev-latest.snap
 			"""
 
+			// destroy existing management template on test node and install latest available snap
 			sh """
 				set +x
 				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
