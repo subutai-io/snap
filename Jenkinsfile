@@ -43,6 +43,8 @@ try {
   if (env.BRANCH_NAME == 'dev') {
     lock('test-node-core16') {
       // destroy existing management template on test node and install latest available snap
+      unstash "snap"
+
       sh """
         set +x
         scp \$(ls ${snapAppName}*_amd64.snap) root@{env.SS_TEST_NODE_CORE16}:/tmp/subutai-dev-latest.snap
@@ -98,7 +100,6 @@ try {
   }
 
   stage("Upload to Ubuntu Store")
-  unstash "snap"
 
   notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
   sh """
