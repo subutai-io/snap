@@ -46,8 +46,11 @@ try {
       unstash "snap"
 
       sh """
-        set +x
         scp \$(ls ${snapAppName}*_amd64.snap) root@${env.SS_TEST_NODE_CORE16}:/tmp/subutai-dev-latest.snap
+      """
+
+      sh """
+        set +x
         ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
         set -e
         subutai-dev destroy everything
