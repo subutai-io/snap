@@ -48,7 +48,6 @@ try {
 	if (env.BRANCH_NAME == 'dev') {
 		lock('test-node-core16') {
 			// destroy existing management template on test node and install latest available snap
-			unstash "snap"
 
 			sh """
 				scp \$(ls ${snapAppName}*_amd64.snap) root@${env.SS_TEST_NODE_CORE16}:/tmp/subutai-dev-latest.snap
@@ -106,15 +105,19 @@ try {
 				fi
 			"""
 		}
-	}
+	} // end if
+	} // end node
 
+	node("snapcraft") {
+	// upload snap to ubuntu store
 	stage("Upload to Ubuntu Store")
-
+	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
 	sh """
 		snapcraft push \$(ls ${snapAppName}*_amd64.snap) --release beta
 	"""
 	}
+
 } catch (e) { 
 	currentBuild.result = "FAILED"
 	throw e
