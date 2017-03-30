@@ -4,6 +4,8 @@ import groovy.json.JsonSlurperClassic
 
 notifyBuildDetails = ""
 snapAppName = ""
+commitId = ""
+serenityReportDir = ""
 
 try {
 	notifyBuild('STARTED')
@@ -15,6 +17,9 @@ try {
 		notifyBuildDetails = "\nFailed on Stage - Checkout source"
 
 		checkout scm
+
+		commitId = sh (script: "git rev-parse HEAD", returnStdout: true)
+		serenityReportDir = "/var/lib/jenkins/www/serenity/${commitId}"
 
 		stage("Generate snapcraft.yaml")
 
