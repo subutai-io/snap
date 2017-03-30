@@ -14,7 +14,8 @@ apps:
                 command: bin/btrfsinit
         #criu:
         #        command: bin/criu
-
+        rsync:
+                 command: bin/rsync
         dhcp-service:
                 command: bin/dhcpd.sh
                 daemon: simple
@@ -64,6 +65,11 @@ parts:
                         - share/openvswitch/vswitch.ovsschema
                         - -etc
                         - -include
+        rsync:
+                plugin: autotools 
+                source: https://download.samba.org/pub/rsync/src/rsync-3.1.2.tar.gz
+                snap:
+                        - -share
         btrfs-progs:
                 plugin: autotools
                 configflags: ["--disable-documentation"]
@@ -191,7 +197,7 @@ parts:
 
         nginx:
                 plugin: autotools
-                source: http://nginx.org/download/nginx-1.10.1.tar.gz
+                source: http://nginx.org/download/nginx-1.10.3.tar.gz
                 build-packages:
                         - libpcre3-dev 
                         - libssl-dev
