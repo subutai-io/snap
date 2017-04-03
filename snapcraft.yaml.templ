@@ -1,5 +1,5 @@
 name: (SUBUTAI)
-version: "4.0.14-(BRANCH)"
+version: "4.0.15-(BRANCH)"
 confinement: devmode
 summary: Open Source LXC orchestration tool
 description: "For more details please visit our site: https://subut.ai"
@@ -14,7 +14,8 @@ apps:
                 command: bin/btrfsinit
         #criu:
         #        command: bin/criu
-
+        rsync:
+                 command: bin/rsync
         dhcp-service:
                 command: bin/dhcpd.sh
                 daemon: simple
@@ -28,7 +29,7 @@ apps:
                 command: bin/rngd -f -r /dev/urandom
                 daemon: simple
         p2p-service:
-                command: bin/p2p daemon -save $SNAP_DATA/p2p.save
+                command: bin/p2p daemon -save $SNAP_DATA/p2p.save -syslog 127.0.0.1:1514
                 daemon: simple
         dns-service:
                 command: bin/dnsmasq -k --address=/gw.intra.lan/10.10.10.1
@@ -64,6 +65,11 @@ parts:
                         - share/openvswitch/vswitch.ovsschema
                         - -etc
                         - -include
+        rsync:
+                plugin: autotools 
+                source: https://download.samba.org/pub/rsync/src/rsync-3.1.2.tar.gz
+                snap:
+                        - -share
         btrfs-progs:
                 plugin: autotools
                 configflags: ["--disable-documentation"]
@@ -191,7 +197,7 @@ parts:
 
         nginx:
                 plugin: autotools
-                source: http://nginx.org/download/nginx-1.10.1.tar.gz
+                source: http://nginx.org/download/nginx-1.10.3.tar.gz
                 build-packages:
                         - libpcre3-dev 
                         - libssl-dev
