@@ -9,7 +9,13 @@ function subutai() {
 }
 
 branch="$(git rev-parse --abbrev-ref HEAD | grep -iv head)"
+version="$(git describe --tags)"
 
 cp snapcraft.yaml.templ snapcraft.yaml
-sed -e "s/(BRANCH)/$branch/g" -i snapcraft.yaml
+if [ "$branch" == "" ]; then 
+	sed -e "s/source-branch:\ (BRANCH)/source-tag:\ $version/g" -i snapcraft.yaml
+	sed -e "s/version:\ \"(VERSION)(BRANCH)\"/version: \"$version\"/g" -i snapcraft.yaml
+fi
+sed -e "s/(VERSION)/$version/g" -i snapcraft.yaml
+sed -e "s/(BRANCH)/-$branch/g" -i snapcraft.yaml
 sed -e "s/(SUBUTAI)/$(subutai $branch)/g" -i snapcraft.yaml
