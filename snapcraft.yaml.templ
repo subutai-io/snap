@@ -12,8 +12,8 @@ apps:
                 command: bin/p2p
         btrfsinit:
                 command: bin/btrfsinit
-        #criu:
-        #        command: bin/criu
+        criu:
+                command: bin/criu
         rsync:
                  command: bin/rsync
         dhcp-service:
@@ -107,26 +107,26 @@ parts:
                         - protobuf-compiler
                 snap:
                         - lib
-        #criu:
-        #        plugin: make
-        #        make-parameters: ["-i", "-k"]
-        #        source: https://github.com/xemul/criu.git
-        #        build-packages:
-        #                - build-essential
-        #                - libprotobuf-dev
-        #                - libprotobuf-c-dev
-        #                - protobuf-c-compiler
-        #                - protobuf-compiler
-        #                - python-protobuf
-        #                - libnl-3-dev
-        #                - libcap-dev
-        #        organize:
-        #                usr/local/sbin: bin
-        #                usr/local/lib: lib 
-        #        snap:
-        #                - bin/criu
-        #                - lib
-        #                - -usr/local
+        criu:
+                plugin: make
+                make-parameters: ["-i", "-k"]
+                source: https://github.com/xemul/criu.git
+                build-packages:
+                        - build-essential
+                        - libprotobuf-dev
+                        - libprotobuf-c-dev
+                        - protobuf-c-compiler
+                        - protobuf-compiler
+                        - python-protobuf
+                        - libnl-3-dev
+                        - libcap-dev
+                organize:
+                        usr/local/sbin: bin
+                        usr/local/lib: lib 
+                snap:
+                        - bin/criu
+                        - lib
+                        - -usr/local
 
         dnsmasq:
                 plugin: make
