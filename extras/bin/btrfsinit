@@ -22,6 +22,7 @@ systemctl start $UNIT
 systemctl enable $UNIT
 
 mkdir -p $SNAP_DATA/../common/lxc/tmpdir
+mkdir -p $SNAP_DATA/../common/lxc/backups
 
 $SNAP/bin/btrfs quota enable $SNAP_DATA/../common/lxc/tmpdir
 

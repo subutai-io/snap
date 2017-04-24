@@ -1,5 +1,5 @@
 name: (SUBUTAI)
-version: "4.0.15-(BRANCH)"
+version: "4.0.16-(BRANCH)"
 confinement: devmode
 summary: Open Source LXC orchestration tool
 description: "For more details please visit our site: https://subut.ai"
@@ -12,18 +12,13 @@ apps:
                 command: bin/p2p
         btrfsinit:
                 command: bin/btrfsinit
-        #criu:
-        #        command: bin/criu
         rsync:
                  command: bin/rsync
         dhcp-service:
                 command: bin/dhcpd.sh
                 daemon: simple
         agent-service:
-                command: bin/agent.sh
-                daemon: simple
-        cgmanager-service:
-                command: bin/cgmanagerd.sh
+                command: bin/subutai daemon
                 daemon: simple
         rngd-service:
                 command: bin/rngd -f -r /dev/urandom
@@ -83,20 +78,6 @@ parts:
                         - bin/btrfsck  
                         - bin/mkfs.btrfs 
                         - -include
-        cgmanager:
-                plugin: autotools
-                source: git://github.com/lxc/cgmanager
-                build-packages:
-                        - libnih-dev
-                        - libnih-dbus-dev
-                        - libpam0g-dev
-                        - nih-dbus-tool
-                organize:
-                        sbin: bin
-                snap:
-                        - lib
-                        - libexec
-                        - bin
         libprotobuf-c:
                 plugin: autotools
                 source: https://github.com/protobuf-c/protobuf-c.git
@@ -107,26 +88,27 @@ parts:
                         - protobuf-compiler
                 snap:
                         - lib
-        #criu:
-        #        plugin: make
-        #        make-parameters: ["-i", "-k"]
-        #        source: https://github.com/xemul/criu.git
-        #        build-packages:
-        #                - build-essential
-        #                - libprotobuf-dev
-        #                - libprotobuf-c-dev
-        #                - protobuf-c-compiler
-        #                - protobuf-compiler
-        #                - python-protobuf
-        #                - libnl-3-dev
-        #                - libcap-dev
-        #        organize:
-        #                usr/local/sbin: bin
-        #                usr/local/lib: lib 
-        #        snap:
-        #                - bin/criu
-        #                - lib
-        #                - -usr/local
+        criu:
+                plugin: make
+                make-parameters: ["-i", "-k"]
+                source: https://github.com/xemul/criu.git
+                build-packages:
+                        - build-essential
+                        - libprotobuf-dev
+                        - libprotobuf-c-dev
+                        - protobuf-c-compiler
+                        - protobuf-compiler
+                        - python-protobuf
+                        - libnl-3-dev
+                        - libcap-dev
+                        - libnet1-dev
+                organize:
+                        usr/local/sbin: bin
+                        usr/local/lib: lib 
+                snap:
+                        - bin/criu
+                        - lib
+                        - -usr/local
 
         dnsmasq:
                 plugin: make
