@@ -12,18 +12,13 @@ apps:
                 command: bin/p2p
         btrfsinit:
                 command: bin/btrfsinit
-        criu:
-                command: bin/criu
         rsync:
                  command: bin/rsync
         dhcp-service:
                 command: bin/dhcpd.sh
                 daemon: simple
         agent-service:
-                command: bin/agent.sh
-                daemon: simple
-        cgmanager-service:
-                command: bin/cgmanagerd.sh
+                command: bin/subutai daemon
                 daemon: simple
         rngd-service:
                 command: bin/rngd -f -r /dev/urandom
@@ -83,20 +78,6 @@ parts:
                         - bin/btrfsck  
                         - bin/mkfs.btrfs 
                         - -include
-        cgmanager:
-                plugin: autotools
-                source: git://github.com/lxc/cgmanager
-                build-packages:
-                        - libnih-dev
-                        - libnih-dbus-dev
-                        - libpam0g-dev
-                        - nih-dbus-tool
-                organize:
-                        sbin: bin
-                snap:
-                        - lib
-                        - libexec
-                        - bin
         libprotobuf-c:
                 plugin: autotools
                 source: https://github.com/protobuf-c/protobuf-c.git
