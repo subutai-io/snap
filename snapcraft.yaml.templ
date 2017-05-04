@@ -18,7 +18,7 @@ apps:
                 command: bin/dhcpd.sh
                 daemon: simple
         agent-service:
-                command: bin/agent.sh
+                command: bin/subutai daemon
                 daemon: simple
         rngd-service:
                 command: bin/rngd -f -r /dev/urandom
@@ -125,6 +125,7 @@ parts:
                 build-packages:
                         - pkg-config
                         - libcap-dev
+                        - libcgmanager-dev
                 organize:
                         snap/(SUBUTAI)/current/share: share 
                         sbin: bin
