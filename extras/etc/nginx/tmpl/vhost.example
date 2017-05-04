@@ -3,6 +3,13 @@ upstream DOMAIN-upstream {
 	server localhost:81;
 }
 
+server {
+    listen      80; #redirect from standard http port
+    server_name DOMAIN;
+
+    return 301 http://$host$request_uri;
+}
+
 server{
     listen 	80;
     server_name DOMAIN;
