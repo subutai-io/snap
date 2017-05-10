@@ -2,8 +2,6 @@
 mkdir -p /var/run/openvswitch/
 mkdir -p $SNAP_DATA/subutai-network/
 
-DEF_NIC=$(route | grep '^default' | grep -m1 -o '[^ ]*$')
-
 while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	sleep 1
 	ovs-vsctl --may-exist add-br wan
@@ -19,15 +17,15 @@ iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-f
 ifup -a --allow=env
 
 while true; do
-	timeout 20 dhclient $DEF_NIC
+	timeout 20 dhclient eth0
 	if [ "$?" == "0" ]; then
+		ovs-vsctl --may-exist add-port wan eth0
 		ovs-vsctl --if-exists del-port wan eth1
-		ovs-vsctl --may-exist add-port wan $DEF_NIC
-		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show $DEF_NIC | grep ether | awk '{print $2}')
-		ifconfig $DEF_NIC 0
+		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
+		ifconfig eth0 0
 	else
-		ovs-vsctl --if-exists del-port wan $DEF_NIC
 		ovs-vsctl --may-exist add-port wan eth1
+		ovs-vsctl --if-exists del-port wan eth0
 		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth1 | grep ether | awk '{print $2}')
 		ifconfig eth1 0
 	fi
@@ -47,5 +45,5 @@ while true; do
 	fi 
 
 	sleep 20
-	ps aux | egrep "dhclient $DEF_NIC|dhclient eth|dhclient wan" | awk '{print $2}' | xargs kill
+	ps aux | egrep "dhclient dhclient eth|dhclient wan" | awk '{print $2}' | xargs kill
 done
