@@ -21,13 +21,13 @@ ifup -a --allow=env
 while true; do
 	timeout 20 dhclient $DEF_NIC
 	if [ "$?" == "0" ]; then
-		ovs-vsctl --may-exist add-port wan $DEF_NIC
 		ovs-vsctl --if-exists del-port wan eth1
+		ovs-vsctl --may-exist add-port wan $DEF_NIC
 		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show $DEF_NIC | grep ether | awk '{print $2}')
 		ifconfig $DEF_NIC 0
 	else
-		ovs-vsctl --may-exist add-port wan eth1
 		ovs-vsctl --if-exists del-port wan $DEF_NIC
+		ovs-vsctl --may-exist add-port wan eth1
 		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth1 | grep ether | awk '{print $2}')
 		ifconfig eth1 0
 	fi
