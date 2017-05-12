@@ -9,13 +9,10 @@ iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-f
 
 ifup -a --allow=env
 
-if [ -f "$SNAP_DATA/.ip" ]; then
-	while true; do
-		echo $(subutai info ipaddr) | nc $(cat "$SNAP_DATA/.ip") 48723
-		if [ "$(echo $?)" == "0" ]; then
-			rm -f "$SNAP_DATA/.ip"
-		fi
-
-		sleep 4
-	done
-fi 
+while [ -f "$SNAP_DATA/.ip" ]; do
+	echo $(subutai info ipaddr) | nc $(cat "$SNAP_DATA/.ip") 48723
+	if [ "$(echo $?)" == "0" ]; then
+		rm -f "$SNAP_DATA/.ip"
+	fi
+	sleep 4 
+done
