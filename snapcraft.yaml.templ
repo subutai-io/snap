@@ -13,7 +13,10 @@ apps:
         btrfsinit:
                 command: bin/btrfsinit
         rsync:
-                 command: bin/rsync
+                command: bin/rsync
+	roaming-service:
+                command: bin/roaming
+	        daemon: simple
         dhcp-service:
                 command: bin/dhcpd.sh
                 daemon: simple
@@ -35,12 +38,12 @@ apps:
         ovs-init-switch-service:
                 command: bin/ovs-init-switch
                 daemon: simple
-        ovs-init-br-service:
-                command: bin/ovs-init-br
-                daemon: simple
         nginx-service:
                 command: bin/nginx.sh start
                 daemon: simple
+        net-post-conf:
+                command: bin/ovs-init-br
+                daemon: oneshot 
 
 parts:
         wrappers:

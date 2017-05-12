@@ -1,0 +1,15 @@
+#!/bin/bash
+
+while true; do
+	timeout 10 dhclient eth0
+        if [ "$?" == "0" ]; then
+		ifconfig eth1 down
+		ifconfig eth2 down
+	else
+		dhclient -r eth0
+		timeout 10 dhclient eth1
+		timeout 10 dhclient eth2
+	fi
+	ps aux | egrep "dhclient eth" | awk '{print $2}' | xargs kill
+	sleep 5
+done
