@@ -45,5 +45,5 @@ while true; do
 	fi 
 
 	sleep 20
-	ps aux | egrep "dhclient dhclient eth|dhclient wan" | awk '{print $2}' | xargs kill
+	ps aux | egrep "dhclient eth|dhclient wan" | awk '{print $2}' | xargs kill
 done
