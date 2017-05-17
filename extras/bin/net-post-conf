@@ -3,15 +3,13 @@
 iptables -t nat -A POSTROUTING -j MASQUERADE
 iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-fill
 
-while [ "`ifconfig | grep '10.10.10.254' | wc -l`" -eq "0" ]; do
-	ovs-vsctl --may-exist add-br lxc-br
-	ifconfig lxc-br 10.10.10.254/24
-done
-
 while [ -f "$SNAP_DATA/.ip" ]; do
-	echo $(subutai info ipaddr) | nc $(cat "$SNAP_DATA/.ip") 48723
-	if [ "$(echo $?)" == "0" ]; then
-		rm -f "$SNAP_DATA/.ip"
+	ip="$(subutai info ipaddr)"
+	if [ "$ip" != "null" ]; then
+		echo "$ip" | nc $(cat "$SNAP_DATA/.ip") 48723
+		if [ "$(echo $?)" == "0" ]; then
+			rm -f "$SNAP_DATA/.ip"
+		fi
 	fi
 	sleep 4 
 done
