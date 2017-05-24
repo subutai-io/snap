@@ -42,7 +42,7 @@ apps:
                 command: bin/nginx.sh start
                 daemon: simple
         net-post-conf:
-                command: bin/ovs-init-br
+                command: bin/net-post-conf
                 daemon: oneshot 
 
 parts:
