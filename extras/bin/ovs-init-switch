@@ -12,7 +12,7 @@ ovs-vsctl --no-wait init
 
 if [ -f "/var/run/openvswitch/vswitchd.pid" ]; then
     grep "ovs-vswitchd" /proc/`cat /var/run/openvswitch/vswitchd.pid`/cmdline
-    if [ ! $? ]; then
+    if [ "$?" == "0" ]; then
         echo "ovs-switchd seems already running"
         exit 0
     else

@@ -7,7 +7,7 @@ while [ -f "$SNAP_DATA/.ip" ]; do
 	ip="$(subutai info ipaddr)"
 	if [ "$ip" != "null" ]; then
 		echo "$ip" | nc $(cat "$SNAP_DATA/.ip") 48723
-		if [ "$(echo $?)" == "0" ]; then
+		if [ "$?" == "0" ]; then
 			rm -f "$SNAP_DATA/.ip"
 		fi
 	fi
