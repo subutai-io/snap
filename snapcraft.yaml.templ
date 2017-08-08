@@ -1,5 +1,5 @@
 name: (SUBUTAI)
-version: "4.0.16-(BRANCH)"
+version: "5.0.0-(BRANCH)"
 grade: stable
 confinement: devmode
 summary: Open Source LXC orchestration tool
@@ -83,6 +83,7 @@ parts:
         libprotobuf-c:
                 plugin: autotools
                 source: https://github.com/protobuf-c/protobuf-c.git
+                source-tag: v1.2.1
                 build-packages:
                         - libprotoc-dev
                         - g++
