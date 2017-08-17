@@ -104,7 +104,7 @@ function waitForSubutai() {
 
 function waitForSnapd() {
 	echo "Waiting for snapd"
-	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap info subutai" > /dev/null 2>&1; echo $?)" != "0" ]; do
+	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list" > /dev/null 2>&1; echo $?)" != "0" ]; do
 		sleep 2
 	done
 }
