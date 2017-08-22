@@ -45,6 +45,7 @@ apps:
         net-post-conf:
                 command: bin/net-post-conf
                 daemon: oneshot 
+		restart-condition: never
 
 parts:
         wrappers:
