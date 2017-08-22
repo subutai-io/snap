@@ -2,12 +2,7 @@
 vlan="$(grep '#vlan_id' $SNAP_DATA/../common/lxc/$1/config | awk '{print $3}')"
 gateway="$(grep 'lxc.network.ipv4.gateway' $SNAP_DATA/../common/lxc/$1/config | awk '{print $3}')"
 
-if [ "$5" == "management" ]; then
-	ovs-vsctl --if-exists del-port lxc-br $5
-	ovs-vsctl --may-exist add-port lxc-br $5
-
-        exit 0
-elif [ "$vlan" ]; then
+if [ "$vlan" ]; then
         ovs-vsctl --may-exist add-br gw-$vlan
 	ovs-vsctl set bridge gw-$vlan stp-enable=true
 	ovs-vsctl --if-exists set port gw-$vlan "tag=$vlan"
@@ -35,6 +30,10 @@ elif [ "$vlan" ]; then
         ovs-ofctl add-flow gw-$vlan "priority=2500,in_port=LOCAL,ip,nw_src=192.168.0.0/16 actions=drop"
 
 else
+	if [ "`ifconfig | grep '10.10.10.254' | wc -l`" == "0" ]; then
+	        ovs-vsctl --may-exist add-br lxc-br
+	        ifconfig lxc-br 10.10.10.254/24
+	fi
         ovs-vsctl --if-exists del-port lxc-br $5
         ovs-vsctl --may-exist add-port lxc-br $5
 	echo -e "\n10.10.10.254  gw.intra.lan" >> $SNAP_DATA/../common/lxc/$1/rootfs/etc/hosts
