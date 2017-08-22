@@ -1,5 +1,6 @@
 name: (SUBUTAI)
-version: "4.0.16-(BRANCH)"
+version: "5.0.0-(BRANCH)"
+grade: stable
 confinement: devmode
 summary: Open Source LXC orchestration tool
 description: "For more details please visit our site: https://subut.ai"
@@ -52,9 +53,10 @@ parts:
         ovs:
                 plugin: autotools
                 source: https://github.com/openvswitch/ovs.git 
+                source-tag: v2.5.2
                 organize:
                         sbin: bin
-                snap:
+                prime:
                         - bin/ovsdb-server
                         - bin/ovsdb-tool
                         - bin/ovs-ofctl
@@ -66,7 +68,7 @@ parts:
         rsync:
                 plugin: autotools 
                 source: https://download.samba.org/pub/rsync/src/rsync-3.1.2.tar.gz
-                snap:
+                prime:
                         - -share
         btrfs-progs:
                 plugin: autotools
@@ -76,7 +78,7 @@ parts:
                         - libblkid-dev
                         - e2fslibs-dev 
                         - liblzo2-dev
-                snap:
+                prime:
                         - bin/btrfs  
                         - bin/btrfsck  
                         - bin/mkfs.btrfs 
@@ -84,12 +86,13 @@ parts:
         libprotobuf-c:
                 plugin: autotools
                 source: https://github.com/protobuf-c/protobuf-c.git
+                source-tag: v1.2.1
                 build-packages:
                         - libprotoc-dev
                         - g++
                         - libprotobuf-dev
                         - protobuf-compiler
-                snap:
+                prime:
                         - lib
         criu:
                 plugin: make
@@ -108,7 +111,7 @@ parts:
                 organize:
                         usr/local/sbin: bin
                         usr/local/lib: lib 
-                snap:
+                prime:
                         - bin/criu
                         - lib
                         - -usr/local
@@ -118,7 +121,7 @@ parts:
                 source: git://thekelleys.org.uk/dnsmasq.git
                 organize:
                         usr/local/sbin: bin 
-                snap:
+                prime:
                         - bin/dnsmasq
                         - -usr/local/share
         lxc:
@@ -133,7 +136,7 @@ parts:
                 organize:
                         snap/(SUBUTAI)/current/share: share 
                         sbin: bin
-                snap:
+                prime:
                         - etc/default
                         - etc/lxc
                         - lib
@@ -154,14 +157,14 @@ parts:
                         - golang
                 organize:
                         opt/subutai/bin/p2p: bin/p2p
-                snap:
+                prime:
                         - -opt
         rngd:
                 plugin: autotools
                 source: https://github.com/cernekee/rng-tools.git
                 organize:
                         sbin: bin
-                snap:
+                prime:
                         - bin/rngd
         subutai:
                 plugin: make
@@ -179,7 +182,7 @@ parts:
                 source: lp:~serge-hallyn/+junk/nsexec
                 organize:
                         usr/bin: bin
-                snap:
+                prime:
                         - bin/uidmapshift
 
         nginx:
@@ -191,7 +194,7 @@ parts:
                 configflags: ["--conf-path=/snap/$SNAPCRAFT_PROJECT_NAME/current/etc/nginx/nginx.conf", "--error-log-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/log/error.log", "--http-log-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/log/access.log", "--pid-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/run/nginx.pid", "--lock-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/run/nginx.lock", "--http-client-body-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/client_temp", "--http-proxy-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/proxy_temp", "--http-fastcgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/fastcgi_temp", "--http-uwsgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/uwsgi_temp", "--http-scgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/scgi_temp", "--with-http_ssl_module", "--with-http_realip_module", "--with-http_addition_module", "--with-http_sub_module", "--with-http_dav_module", "--with-http_flv_module", "--with-http_mp4_module", "--with-http_gunzip_module", "--with-http_gzip_static_module", "--with-http_random_index_module", "--with-http_secure_link_module", "--with-http_stub_status_module", "--with-http_auth_request_module", "--with-threads", "--with-stream", "--with-stream_ssl_module", "--with-http_slice_module", "--with-mail", "--with-mail_ssl_module", "--with-file-aio", "--with-http_v2_module", "--with-ipv6"]
                 organize:
                         sbin: bin
-                snap:
+                prime:
                         - -html
                         - -var
                         - -snap
