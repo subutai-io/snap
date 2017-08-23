@@ -92,21 +92,14 @@ function installLocalSnap() {
 
 function installSnapFromStore() {
 	echo "Running installation command"
-	sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --beta --devmode $SUBUTAI"
+	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list $SUBUTAI" > /dev/null 2>&1; echo $?)" != "0" ]; do
+		sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap install --beta --devmode $SUBUTAI"
+		sleep 2
+        done
 }
 
 function waitForSubutai() {
-	echo "Waiting for $SUBUTAI installation complete"
-	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list $SUBUTAI" > /dev/null 2>&1; echo $?)" != "0" ]; do
-		sleep 2
-	done
-}
-
-function waitForSnapd() {
-	echo "Waiting for snapd"
-	while [ "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list" > /dev/null 2>&1; echo $?)" != "0" ]; do
-		sleep 2
-	done
+	echo "$(sshpass -p "ubuntai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 subutai@localhost "sudo snap list $SUBUTAI" > /dev/null 2>&1; echo $?)"
 }
 
 function setAutobuildIP() {
@@ -246,16 +239,17 @@ if [ "$CONF" != "" ]; then
 fi
 
 cloneVm "$CLONE"
-waitForSnapd
 
-SNAP=$(localSnap)
-if [ "$SNAP" != "" ]; then
-	installLocalSnap "$SNAP"
-else
-	installSnapFromStore
-fi
+while [ $(waitForSubutai) != "0" ]; do
+	SNAP=$(localSnap)
+	if [ "$SNAP" != "" ]; then
+		installLocalSnap "$SNAP"
+	else
+		installSnapFromStore
+	fi
+	sleep 2
+done
 
-waitForSubutai
 setAlias
 
 if [ "$TAG" != "" ]; then
