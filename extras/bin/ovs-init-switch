@@ -12,17 +12,12 @@ ovs-vsctl --no-wait init
 
 if [ -f "/var/run/openvswitch/vswitchd.pid" ]; then
     grep "ovs-vswitchd" /proc/`cat /var/run/openvswitch/vswitchd.pid`/cmdline
-    if [ ! $? ]; then
+    if [ "$?" == "0" ]; then
         echo "ovs-switchd seems already running"
         exit 0
     else
         echo "the switchd is dead, long live the switchd"
     fi
-fi
-
-if [ "$(grep -c Path /etc/systemd/network/50-cloud-init-eth0.link)" == "0" ]; then
-	path="$(networkctl status eth0 | grep Path | awk '{print $2}')-*"
-	sed -i "3iPath=$path" /etc/systemd/network/50-cloud-init-eth0.link
 fi
 
 $SNAP/bin/ovs-vswitchd --pidfile=/var/run/openvswitch/vswitchd.pid --unixctl=/var/run/openvswitch/vswitch.ctl unix:/var/run/openvswitch/db.sock

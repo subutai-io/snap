@@ -1,0 +1,15 @@
+#!/bin/bash
+
+iptables -t nat -A POSTROUTING -j MASQUERADE
+iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-fill
+
+while [ -f "$SNAP_DATA/.ip" ]; do
+	ip="$(subutai info ipaddr)"
+	if [ "$ip" != "null" ]; then
+		echo "$ip" | nc $(cat "$SNAP_DATA/.ip") 48723
+		if [ "$?" == "0" ]; then
+			rm -f "$SNAP_DATA/.ip"
+		fi
+	fi
+	sleep 4 
+done

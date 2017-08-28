@@ -1,0 +1,24 @@
+#!/bin/bash
+
+while [ ! -S /var/run/openvswitch/db.sock ]; do
+    sleep 1
+done
+
+wan="$(ovs-vsctl list-br | grep -c wan)"
+if [ "$wan" == "1" ]; then
+	ovs-vsctl del-br wan && ifconfig wan down
+fi
+
+while true; do
+	timeout 15 dhclient eth0
+       	if [ "$?" == "0" ]; then
+		ifconfig eth1 down
+		ifconfig eth2 down
+	else
+		dhclient -r eth0
+		timeout 10 dhclient eth1
+		timeout 10 dhclient eth2
+	fi
+	pkill dhclient
+	sleep 20
+done
