@@ -10,14 +10,11 @@ if [ "$wan" == "1" ]; then
 fi
 
 while true; do
+	timeout 10 dhclient eth1
+	timeout 10 dhclient eth2
 	timeout 15 dhclient eth0
-       	if [ "$?" == "0" ]; then
-		ifconfig eth1 down
-		ifconfig eth2 down
-	else
+       	if [ "$?" != "0" ]; then
 		dhclient -r eth0
-		timeout 10 dhclient eth1
-		timeout 10 dhclient eth2
 	fi
 	pkill dhclient
 	sleep 20
