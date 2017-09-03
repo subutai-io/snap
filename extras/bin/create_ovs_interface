@@ -2,8 +2,12 @@
 vlan="$(grep '#vlan_id' $SNAP_DATA/../common/lxc/$1/config | awk '{print $3}')"
 gateway="$(grep 'lxc.network.ipv4.gateway' $SNAP_DATA/../common/lxc/$1/config | awk '{print $3}')"
 
-ovs-vsctl --may-exist add-br lxc-br
-ifconfig lxc-br 10.10.10.254/24
+while [ "`ifconfig | grep '10.10.10.254' | wc -l`" == "0" ]; do
+	ovs-vsctl --may-exist add-br lxc-br
+	ifconfig lxc-br up
+	ifconfig lxc-br 10.10.10.254/24
+	sleep 1
+done
 
 if [ "$vlan" ]; then
         ovs-vsctl --may-exist add-br gw-$vlan
