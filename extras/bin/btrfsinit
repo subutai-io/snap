@@ -21,6 +21,8 @@ Type = btrfs
 [Install]
 WantedBy = multi-user.target" > $DIR/$UNIT
 
+mount $1 /var/snap/$SNAP_NAME/common/lxc
+
 systemctl daemon-reload
 systemctl start $UNIT
 systemctl enable $UNIT
@@ -29,5 +31,3 @@ mkdir -p $SNAP_DATA/../common/lxc/tmpdir
 mkdir -p $SNAP_DATA/../common/lxc/backups
 
 $SNAP/bin/btrfs quota enable $SNAP_DATA/../common/lxc/tmpdir
-
-echo -e "\nalias sudo='sudo '\nif [ -f $SNAP/etc/bash_completion ]; then . $SNAP/etc/bash_completion; fi" >> /root/.bashrc
