@@ -2,12 +2,13 @@
 
 umount $1
 
-mkfs.btrfs -f $1
 if [ "$SNAP_NAME" == "" ]; then
 	SNAP_NAME=$(ls /snap | grep subutai | head -n1)
 	SNAP="/snap/$SNAP_NAME/current/"
 	SNAP_DATA="/var/$SNAP"
+	PATH=$PATH:$SNAP/bin/
 fi
+mkfs.btrfs -f $1
 
 UNIT="var-snap-$(echo ${SNAP_NAME} | sed -e "s/-/\\\x2d/g")-common-lxc.mount"
 DIR="/writable/system-data/etc/systemd/system"
