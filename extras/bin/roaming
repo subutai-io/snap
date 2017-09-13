@@ -10,13 +10,16 @@ fi
 
 if [ "$(cat /proc/scsi/scsi | grep -c VBOX)" != "0" ]; then
 	while true; do
-		timeout 10 dhclient eth1
-	        timeout 10 dhclient eth2
         	timeout 15 dhclient eth0
 	        if [ "$?" != "0" ]; then
                 	dhclient -r eth0
         	fi
+		timeout 10 dhclient eth1
+	        timeout 10 dhclient eth2
 	        pkill dhclient
         	sleep 20
+		if [ "$(/sbin/route -n | grep -c ^0.0.0.0)" != "1" ]; then
+			ip route del 0/0
+		fi
 	done
 fi
