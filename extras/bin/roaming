@@ -1,21 +1,25 @@
 #!/bin/bash
-
 while [ ! -S /var/run/openvswitch/db.sock ]; do
     sleep 1
 done
 
 wan="$(ovs-vsctl list-br | grep -c wan)"
 if [ "$wan" == "1" ]; then
-	ovs-vsctl del-br wan && ifconfig wan down
+        ovs-vsctl del-br wan && ifconfig wan down
 fi
 
-while true; do
-	timeout 10 dhclient eth1
-	timeout 10 dhclient eth2
-	timeout 15 dhclient eth0
-       	if [ "$?" != "0" ]; then
-		dhclient -r eth0
-	fi
-	pkill dhclient
-	sleep 20
-done
+if [ "$(cat /proc/scsi/scsi | grep -c VBOX)" != "0" ]; then
+	while true; do
+        	timeout 15 dhclient eth0
+	        if [ "$?" != "0" ]; then
+                	dhclient -r eth0
+        	fi
+		timeout 10 dhclient eth1
+	        timeout 10 dhclient eth2
+	        pkill dhclient
+        	sleep 20
+		if [ "$(/sbin/route -n | grep -c ^0.0.0.0)" != "1" ]; then
+			ip route del 0/0
+		fi
+	done
+fi
