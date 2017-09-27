@@ -31,7 +31,7 @@ apps:
                 command: bin/p2p daemon -save $SNAP_DATA/p2p.save -syslog 127.0.0.1:1514
                 daemon: simple
         dns-service:
-                command: bin/dnsmasq -k --address=/gw.intra.lan/10.10.10.1
+                command: bin/dnsmasq -k
                 daemon: simple
         ovs-init-db-service:
                 command: bin/ovs-init-db

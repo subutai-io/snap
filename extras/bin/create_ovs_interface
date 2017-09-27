@@ -17,7 +17,6 @@ if [ "$vlan" ]; then
         ovs-vsctl add-port gw-$vlan $5 tag=$vlan
         
 	ifconfig gw-$vlan $gateway/24
-	echo -e "\n$gateway	gw.intra.lan" >> $SNAP_DATA/../common/lxc/$1/rootfs/etc/hosts
 
 	ipaddr=$(grep "lxc.network.ipv4 " $SNAP_DATA/../common/lxc/$1/config | awk -F'[ /]' '{print $3}')
 	port=$(expr 10000 + `echo $ipaddr | cut -d'.' -f4`)
@@ -39,7 +38,6 @@ if [ "$vlan" ]; then
 else
         ovs-vsctl --if-exists del-port lxc-br $5
         ovs-vsctl --may-exist add-port lxc-br $5
-	echo -e "\n10.10.10.254  gw.intra.lan" >> $SNAP_DATA/../common/lxc/$1/rootfs/etc/hosts
 fi
 
 rate="$(grep 'subutai.network.ratelimit' $SNAP_DATA/../common/lxc/$1/config | awk '{print $3}')"
