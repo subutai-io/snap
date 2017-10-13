@@ -112,7 +112,7 @@ function setAutobuildIP() {
 function waitPeerIP() {
         echo "Waiting for Subutai IP address"
 	local ip="$(nc -l 48723)"
-	timeout 300 echo -e "*******\\nPlease use following command to access your resource host:\\nssh root@$ip\\nor login \"subutai\" with password \"subutai\"\\n*******"
+	timeout 300 echo -e "*******\\nPlease use following command to access your resource host:\\nssh root@$ip\\nor login \"ubuntu\" with password \"subutai\"\\n*******"
 	ssh-keygen -f ~/.ssh/known_hosts -R $ip > /dev/null 2>&1
 }
 
