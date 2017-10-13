@@ -23,13 +23,13 @@ so `./configure` again and `snapcraft clean`.
 3) Run `snapcraft`. 
 
 If these commands succeed, you will see the Subutai snap package next to snapcraft.yaml which may be used 
-for installation on Ubuntu Core OS (other Snappy based systems have not been tested, and may be unstable).
+for installation on OS with snapd installed.
 
 ## Deploying peers and resource hosts with autobuild
 The snap repository contains a bash script, autobuild, which automates the build of Subutai peers and resource hosts locally. It has several requirements:
 
 1) Hardware: at least 4 core CPU with enabled VT-X and 8Gb RAM
-2) Software: Ubuntu OS, VirtaulBox, [Ubuntu Core](https://cdn.subut.ai:8338/kurjun/rest/raw/get?name=core.ova) imported, sshpass
+2) Software: Ubuntu OS, VirtaulBox, [Ubuntu OS](https://cdn.subut.ai:8338/kurjun/rest/raw/get?name=ubuntu16.ova) imported, sshpass
 3) Internet connection if Subutai snap package doesn't exist in the same directory
 
 If your system meets these requirements you can simply run `./autobuild.sh` in the cloned directory and get the ready-to-use VM with the Subutai Agent installed in ~2-5 minutes. Autobuild output is pretty verbose, you will be able to see the deployment process take place step by step and debug it in case of failure.
