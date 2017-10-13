@@ -241,10 +241,6 @@ fi
 
 cloneVm "$CLONE"
 
-sshpass -p "subutai" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -p5567 ubuntu@localhost "sudo snap list $SUBUTAI"
-echo $?
-sleep 30
-
 while [ $(waitForSubutai) != "0" ]; do
 	SNAP=$(localSnap)
 	if [ "$SNAP" != "" ]; then
