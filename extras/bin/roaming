@@ -13,6 +13,7 @@ if [ "$(cat /proc/scsi/scsi | grep -c VBOX)" != "0" ]; then
 		timeout 15 dhclient enp0s3
 	        if [ "$?" != "0" ]; then
 			dhclient -r enp0s3
+			ifconfig enp0s3 0.0.0.0
         	fi
 		timeout 10 dhclient enp0s8
 		timeout 10 dhclient enp0s9
