@@ -46,6 +46,9 @@ apps:
                 command: bin/net-post-conf
                 daemon: oneshot 
                 restart-condition: never
+        cgmanager-service:
+                command: bin/cgmanagerd.sh
+                daemon: simple
 
 parts:
         wrappers:
