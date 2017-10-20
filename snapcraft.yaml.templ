@@ -157,8 +157,6 @@ parts:
                 make-parameters: [--always-make, snapcraft]
                 source: https://github.com/subutai-io/p2p.git 
                 source-branch: (BRANCH)
-                build-packages:
-                        - golang
                 organize:
                         opt/subutai/bin/p2p: bin/p2p
                 prime:
@@ -177,7 +175,6 @@ parts:
                 make-parameters: [snapcraft]
                 build-packages:
                         - lxc-dev
-                        - golang
                 organize:
                         bin/agent: bin/subutai
         uidmapshift:
