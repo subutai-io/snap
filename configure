@@ -8,7 +8,11 @@ function subutai() {
         fi
 }
 
-branch="$(git rev-parse --abbrev-ref HEAD | grep -iv head)"
+if [ "$1" == "jenkins" ]; then
+	branch="${env.BRANCH_NAME}"
+else
+	branch="$(git rev-parse --abbrev-ref HEAD | grep -iv head)"
+fi
 snap_version="$(git describe --tags)"
 
 cp snapcraft.yaml.templ snapcraft.yaml

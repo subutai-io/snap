@@ -23,16 +23,8 @@ try {
 
 		stage("Generate snapcraft.yaml")
 
-		switch (env.BRANCH_NAME) {
-			case ~/master/: snapAppName = "subutai-master"; break;
-			case ~/dev/: snapAppName = "subutai-dev"; break;
-			default: assert false
-		}		
-
 		sh """
-		cp snapcraft.yaml.templ snapcraft.yaml
-		sed -e 's/(BRANCH)/${env.BRANCH_NAME}/g' -i snapcraft.yaml
-		sed -e 's/(SUBUTAI)/${snapAppName}/g' -i snapcraft.yaml
+			./configure jenkins
 		"""
 
 		stage("Build snap")
