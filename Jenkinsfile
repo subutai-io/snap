@@ -24,7 +24,7 @@ try {
 		stage("Generate snapcraft.yaml")
 
 		sh """
-			./configure jenkins
+			./configure ${env.BRANCH_NAME}
 		"""
 
 		stage("Build snap")

@@ -8,8 +8,8 @@ function subutai() {
         fi
 }
 
-if [ "$1" == "jenkins" ]; then
-	branch="${env.BRANCH_NAME}"
+if [ "$1" != "" ]; then
+	branch="$1"
 else
 	branch="$(git rev-parse --abbrev-ref HEAD | grep -iv head)"
 fi
