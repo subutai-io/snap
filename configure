@@ -9,13 +9,20 @@ function subutai() {
 }
 
 branch="$(git rev-parse --abbrev-ref HEAD | grep -iv head)"
-version="$(git describe --tags)"
+snap_version="$(git describe --tags)"
 
 cp snapcraft.yaml.templ snapcraft.yaml
 if [ "$branch" == "" ]; then 
-	sed -e "s/source-branch:\ (BRANCH)/source-tag:\ $version/g" -i snapcraft.yaml
-	sed -e "s/-(BRANCH)//g" -i snapcraft.yaml
+	p2p_version="$(git ls-remote --tags https://github.com/subutai-io/p2p.git  | grep -o '[0-9]*\.[0-9]*\.[0-9]*' | sort -r | head -1)"
+	agent_version="$(git ls-remote --tags https://github.com/subutai-io/agent.git  | grep -o '[0-9]*\.[0-9]*\.[0-9]*' | sort -r | head -1)"
+	
+	sed -e "s/source-branch:\ (AGENT_BRANCH)/source-tag:\ $agent_version/g" -i snapcraft.yaml
+	sed -e "s/source-branch:\ (P2P_BRANCH)/source-tag:\ $p2p_version/g" -i snapcraft.yaml
+	sed -e "s/-(SNAP_BRANCH)//g" -i snapcraft.yaml
 else
-	sed -e "s/(BRANCH)/$branch/g" -i snapcraft.yaml
+	sed -e "s/(SNAP_BRANCH)/$branch/g" -i snapcraft.yaml
+	sed -e "s/(AGENT_BRANCH)/$branch/g" -i snapcraft.yaml
+	sed -e "s/(P2P_BRANCH)/$branch/g" -i snapcraft.yaml
 fi
+sed -e "s/(SNAP_VERSION)/$snap_version/g" -i snapcraft.yaml
 sed -e "s/(SUBUTAI)/$(subutai $branch)/g" -i snapcraft.yaml
