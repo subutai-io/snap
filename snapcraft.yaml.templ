@@ -1,5 +1,5 @@
 name: (SUBUTAI)
-version: "6.1.1-(BRANCH)"
+version: "(SNAP_VERSION)-(SNAP_BRANCH)"
 grade: stable
 confinement: devmode
 summary: Open Source LXC orchestration tool
@@ -130,7 +130,7 @@ parts:
                         - -usr/local/share
         lxc:
                 plugin: autotools
-                configflags: ["--datadir=/snap/$SNAPCRAFT_PROJECT_NAME/current/share", "--with-config-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/common/lxc"]
+                configflags: ["--datadir=/snap/$SNAPCRAFT_PROJECT_NAME/current/share", "--with-config-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/common/lxc", "--disable-werror"]
                 source: https://github.com/lxc/lxc.git
                 source-tag: lxc-2.0.8
                 build-packages:
@@ -156,9 +156,7 @@ parts:
                 plugin: make
                 make-parameters: [--always-make, snapcraft]
                 source: https://github.com/subutai-io/p2p.git 
-                source-branch: (BRANCH)
-                build-packages:
-                        - golang
+                source-branch: (P2P_BRANCH)
                 organize:
                         opt/subutai/bin/p2p: bin/p2p
                 prime:
@@ -173,11 +171,10 @@ parts:
         subutai:
                 plugin: make
                 source: https://github.com/subutai-io/agent.git 
-                source-branch: (BRANCH)
+                source-branch: (AGENT_BRANCH)
                 make-parameters: [snapcraft]
                 build-packages:
                         - lxc-dev
-                        - golang
                 organize:
                         bin/agent: bin/subutai
         uidmapshift:
@@ -195,7 +192,7 @@ parts:
                 build-packages:
                         - libpcre3-dev 
                         - libssl-dev
-                configflags: ["--conf-path=/snap/$SNAPCRAFT_PROJECT_NAME/current/etc/nginx/nginx.conf", "--error-log-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/log/error.log", "--http-log-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/log/access.log", "--pid-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/run/nginx.pid", "--lock-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/run/nginx.lock", "--http-client-body-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/client_temp", "--http-proxy-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/proxy_temp", "--http-fastcgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/fastcgi_temp", "--http-uwsgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/uwsgi_temp", "--http-scgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/scgi_temp", "--with-http_ssl_module", "--with-http_realip_module", "--with-http_addition_module", "--with-http_sub_module", "--with-http_dav_module", "--with-http_flv_module", "--with-http_mp4_module", "--with-http_gunzip_module", "--with-http_gzip_static_module", "--with-http_random_index_module", "--with-http_secure_link_module", "--with-http_stub_status_module", "--with-http_auth_request_module", "--with-threads", "--with-stream", "--with-stream_ssl_module", "--with-http_slice_module", "--with-mail", "--with-mail_ssl_module", "--with-file-aio", "--with-http_v2_module", "--with-ipv6"]
+                configflags: ["--conf-path=/snap/$SNAPCRAFT_PROJECT_NAME/current/etc/nginx/nginx.conf", "--error-log-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/log/error.log", "--http-log-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/log/access.log", "--pid-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/run/nginx.pid", "--lock-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/run/nginx.lock", "--http-client-body-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/client_temp", "--http-proxy-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/proxy_temp", "--http-fastcgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/fastcgi_temp", "--http-uwsgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/uwsgi_temp", "--http-scgi-temp-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/cache/scgi_temp", "--with-http_ssl_module", "--with-http_realip_module", "--with-http_addition_module", "--with-http_sub_module", "--with-http_dav_module", "--with-http_flv_module", "--with-http_mp4_module", "--with-http_gunzip_module", "--with-http_gzip_static_module", "--with-http_random_index_module", "--with-http_secure_link_module", "--with-http_stub_status_module", "--with-http_auth_request_module", "--with-threads", "--with-stream", "--with-stream_ssl_module", "--with-http_slice_module", "--with-mail", "--with-mail_ssl_module", "--with-file-aio", "--with-http_v2_module", "--with-ipv6", "--with-cc-opt='-Wno-error'"]
                 organize:
                         sbin: bin
                 prime:
