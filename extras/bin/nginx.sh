@@ -9,7 +9,7 @@ mkdir -p $SNAP_DATA/web/ssl/
 
 sed -e "s|/snap/subutai/|/snap/$SNAP_NAME/|g" $SNAP/etc/nginx/proxy.conf > $SNAP_DATA/nginx/conf.d/proxy.conf
 
-while [ "$(route | grep -c default)" == 0 ]; do
+while [ "$(/bin/ip route | grep -c ^default)" == 0 ]; do
         sleep 1
 done
 if [ "$1" == "start" ]; then
