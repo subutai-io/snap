@@ -2,7 +2,7 @@
 vlan="$(grep '#vlan_id' $SNAP_DATA/../common/lxc/$1/config | awk '{print $3}')"
 gateway="$(grep 'lxc.network.ipv4.gateway' $SNAP_DATA/../common/lxc/$1/config | awk '{print $3}')"
 
-while [ "`/bin/ip addr show | grep -c 10.10.10.254`" == "0" ]; do
+while [ "`/bin/ip addr show | grep -c 10.10.10.254`" == "0" ] || [ "$(ovs-vsctl show | grep -c lxc-br)" == "0" ]; do
 	ovs-vsctl --may-exist add-br lxc-br
 	/bin/ip link set lxc-br up
 	/bin/ip addr add 10.10.10.254/24 dev lxc-br
