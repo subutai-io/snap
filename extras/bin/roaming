@@ -9,13 +9,15 @@ if [ "$(cat /proc/scsi/scsi | grep -c VBOX)" != "0" ]; then
 	        if [ "$?" != "0" ]; then
 			dhclient -r enp0s3
 			/bin/ip addr flush dev enp0s3
-        	fi
+		else
+                        if [ "$(ip route list exact 0/0 | grep -c enp0s3)" == "0" ]; then
+                                ip route del 0/0
+                                continue
+                        fi
+                fi
 		timeout 10 dhclient enp0s8
 		timeout 10 dhclient enp0s9
 	        pkill dhclient
         	sleep 20
-		if [ "$(/bin/ip route | grep -c ^default)" != "1" ]; then
-			ip route del 0/0
-		fi
 	done
 fi
