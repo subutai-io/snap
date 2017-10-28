@@ -17,6 +17,7 @@ if [ "$vlan" ]; then
         ovs-vsctl add-port gw-$vlan $5 tag=$vlan
         
 	/bin/ip addr add $gateway/24 dev gw-$vlan
+	/bin/ip link set gw-$vlan up
 
 	ipaddr=$(grep "lxc.network.ipv4 " $SNAP_DATA/../common/lxc/$1/config | awk -F'[ /]' '{print $3}')
 	port=$(expr 10000 + `echo $ipaddr | cut -d'.' -f4`)
