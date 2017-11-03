@@ -17,8 +17,8 @@ snap_version="$(git describe --tags)"
 
 cp snapcraft.yaml.templ snapcraft.yaml
 if [ "$branch" == "" ]; then 
-	p2p_version="$(git ls-remote --tags https://github.com/subutai-io/p2p.git  | grep -o '[0-9]*\.[0-9]*\.[0-9]*' | sort  -t'.' -nk1 -nk3 -ur | head -1)"
-	agent_version="$(git ls-remote --tags https://github.com/subutai-io/agent.git  | grep -o '[0-9]*\.[0-9]*\.[0-9]*' | sort -r | head -1)"
+	p2p_version="$(git ls-remote --tags https://github.com/subutai-io/p2p.git  | grep -o '[0-9]*\.[0-9]*\.[0-9]*' | sort  -t'.' -nk1,1 -nk2,2 -nk3,3 -ur | head -1)"
+	agent_version="$(git ls-remote --tags https://github.com/subutai-io/agent.git  | grep -o '[0-9]*\.[0-9]*\.[0-9]*' | sort  -t'.' -nk1,1 -nk2,2 -nk3,3 -ur | head -1)"
 	
 	sed -e "s/source-branch:\ (AGENT_BRANCH)/source-tag:\ $agent_version/g" -i snapcraft.yaml
 	sed -e "s/source-branch:\ (P2P_BRANCH)/source-tag:\ $p2p_version/g" -i snapcraft.yaml
