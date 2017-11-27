@@ -1,4 +1,5 @@
 # Snap repository
+
 Subutai snap repository objectives:
 - deploy, test and upload new snap packages to the Store 
 - provide a way to build the Subutai Agent snap package using the [snapcraft](https://snapcraft.io/) tool
