@@ -1,7 +1,0 @@
-!GlobalState
-assets:
-  build-packages: [python2.7-dev=2.7.12-1ubuntu0~16.04.1, libexpat1-dev=2.1.0-7ubuntu0.16.04.3,
-    libpython-all-dev=2.7.11-1, libpython2.7=2.7.12-1ubuntu0~16.04.1, libpython2.7-dev=2.7.12-1ubuntu0~16.04.1,
-    libpython-dev=2.7.11-1, python-all=2.7.11-1, python-dev=2.7.11-1, python-setuptools=20.7.0-1,
-    python-wheel=0.29.0-1, python-pip-whl=8.1.1-2ubuntu0.4, python-pip=8.1.1-2ubuntu0.4,
-    python-all-dev=2.7.11-1]
