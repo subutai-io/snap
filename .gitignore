@@ -4,3 +4,5 @@ stage
 snapcraft.yaml
 *.snap
 *.vagrant
+.idea
+*.iml
