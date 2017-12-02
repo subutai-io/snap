@@ -5,7 +5,7 @@ confinement: devmode
 summary: Open Source LXC orchestration tool
 description: "For more details please visit our site: https://subut.ai"
 environment:
-        PYTHONPATH: $PYTHONPATH:$SNAP/lib/python2.7/site-packages
+        PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.5/site-packages
 
 apps:
         (SUBUTAI):
@@ -200,7 +200,7 @@ parts:
                         - -snap
         certbot:
                 plugin: python
-                python-version: python2
+                python-version: python3
                 python-packages:
                         - certbot==0.19.0
 
