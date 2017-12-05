@@ -4,8 +4,6 @@ grade: stable
 confinement: devmode
 summary: Open Source LXC orchestration tool
 description: "For more details please visit our site: https://subut.ai"
-environment:
-        PYTHONPATH: $PYTHONPATH:$SNAP/lib/python2.7/site-packages
 
 apps:
         (SUBUTAI):
@@ -13,8 +11,6 @@ apps:
                 aliases: [subutai]
         p2p:
                 command: bin/p2p
-        certbot: 
-                command: bin/certbot
         roaming-service:
                 command: bin/roaming
                 daemon: simple
@@ -198,10 +194,3 @@ parts:
                         - -html
                         - -var
                         - -snap
-        certbot:
-                source: https://github.com/certbot/certbot/archive/v0.19.0.tar.gz
-                plugin: python
-                python-version: python2
-                build-packages: [python-dev, libffi-dev, gcc, libssl-dev]
-
-# vim: ts=8 et nowrap autoindent
