@@ -199,9 +199,9 @@ parts:
                         - -var
                         - -snap
         certbot:
+                source: https://github.com/certbot/certbot/archive/v0.19.0.tar.gz
                 plugin: python
                 python-version: python2
-                python-packages:
-                        - certbot==0.19.0
+                build-packages: [python-dev, libffi-dev, gcc, libssl-dev]
 
 # vim: ts=8 et nowrap autoindent
