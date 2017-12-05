@@ -26,6 +26,7 @@ apps:
         p2p-service:
                 command: bin/p2p daemon -save $SNAP_DATA/p2p.save -syslog 127.0.0.1:1514
                 daemon: simple
+                restart-condition: always
         dns-service:
                 command: bin/dnsmasq -k
                 daemon: simple
