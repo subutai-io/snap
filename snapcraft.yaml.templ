@@ -4,6 +4,8 @@ grade: stable
 confinement: devmode
 summary: Open Source LXC orchestration tool
 description: "For more details please visit our site: https://subut.ai"
+environment:
+        PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.5/site-packages
 
 apps:
         (SUBUTAI):
@@ -11,6 +13,8 @@ apps:
                 aliases: [subutai]
         p2p:
                 command: bin/p2p
+        certbot: 
+                command: bin/certbot
         roaming-service:
                 command: bin/roaming
                 daemon: simple
@@ -132,7 +136,6 @@ parts:
                 build-packages:
                         - pkg-config
                         - libcap-dev
-                        - libcgmanager-dev
                 organize:
                         snap/(SUBUTAI)/current/share: share 
                         sbin: bin
@@ -195,3 +198,10 @@ parts:
                         - -html
                         - -var
                         - -snap
+        certbot:
+                plugin: python
+                python-version: python3
+                python-packages:
+                        - certbot==0.19.0
+
+# vim: ts=8 et nowrap autoindent
