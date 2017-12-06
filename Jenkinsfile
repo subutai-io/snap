@@ -37,7 +37,7 @@ try {
 
 	node() {
 	// Start Test-Peer Lock
-	if (env.BRANCH_NAME == 'test_new_node') {
+	if (env.BRANCH_NAME == 'dev') {
 		lock('test-node-new') {
 			unstash "snap"
 
