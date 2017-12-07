@@ -9,7 +9,7 @@ serenityReportDir = ""
 
 try {
 	notifyBuild('STARTED')
-	node("snapcraft-new") {
+	node("snapcraft") {
 		deleteDir()
 
 		stage("Checkout source")
@@ -42,7 +42,7 @@ try {
 			unstash "snap"
 
 			sh """
-				scp -C \$(ls ${snapAppName}*_amd64.snap) ubuntu@${env.SS_TEST_NODE_NEW}:/tmp/subutai-dev-latest.snap
+				scp -i -C \$(ls ${snapAppName}*_amd64.snap) ubuntu@${env.SS_TEST_NODE_NEW}:/tmp/subutai-dev-latest.snap
 			"""
 
 			// destroy existing management template on test node and install latest available snap
@@ -101,7 +101,7 @@ try {
 	} // end if
 	} // end node
 
-	node("snapcraft-new") {
+	node("snapcraft") {
 	// upload snap to ubuntu store
 	stage("Upload to Ubuntu Store")
 	unstash "snap"
