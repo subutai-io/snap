@@ -42,7 +42,7 @@ try {
 			unstash "snap"
 
 			sh """
-				scp -v \$(ls ${snapAppName}*_amd64.snap) root@${env.SS_TEST_NODE_NEW}:/tmp/subutai-dev-latest.snap
+				scp \$(ls ${snapAppName}*_amd64.snap) root@${env.SS_TEST_NODE_NEW}:/tmp/subutai-dev-latest.snap
 			"""
 
 			// destroy existing management template on test node and install latest available snap
