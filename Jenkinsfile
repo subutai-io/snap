@@ -116,14 +116,14 @@ try {
 	/* cdn auth credentials*/
 	String url = "https://devcdn.subut.ai:8338/kurjun/rest"
 	String user = "jenkins"
-	sh """
+	def authID = sh (script: """
 		set +x
 		curl -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
-	"""
-	sh """
+	""" returnStdout: true)
+	def token = sh (script: """
 		set +x
 		curl -k -Fmessage=\"${authID}\" -Fuser=${user} "${url}/auth/token"
-	"""
+	""" returnStdout: true)
 	sh """
 		set +x
 		curl -k -Ffile=@${snapAppName}*_amd64.snap -H "token:$TOKEN" "$URL/raw/upload"
