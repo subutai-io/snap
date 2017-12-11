@@ -64,7 +64,18 @@ try {
 				set -e
 				echo y | subutai-dev import management
 			EOF"""
-
+			
+			// configure dns server in management console
+			sh """
+				set +x
+				ssh root@${env.SS_TEST_NODE_NEW} <<- EOF
+				set -e
+				echo y | subutai-dev attach management
+				echo y | echo "dns-nameservers 8.8.8.8" >> /etc/network/interfaces
+				echo Y | systemctl restart networking
+				exho y | exit
+			EOF"""
+			
 			/* wait until SS starts */
 			timeout(time: 5, unit: 'MINUTES') {
 				sh """
