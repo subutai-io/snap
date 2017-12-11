@@ -109,8 +109,26 @@ try {
 	sh """
 		snapcraft push \$(ls -t ${snapAppName}*_amd64.snap | head -1 ) --release beta
 	"""
+	// upload snap to Kurjun
+	stage("Upload to Kurjun")
+	unstash "snap"
+	notifyBuildDetails = "\nFailed on Stage - Upload to Kurjun"
+	/* cdn auth credentials*/
+	String url = "https://devcdn.subut.ai:8338/kurjun/rest"
+	String user = "jenkins"
+	sh """
+		set +x
+		curl -s -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
+	"""
+	sh """
+		set +x
+		curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} ${url}/auth/token
+	"""
+	sh """
+		set +x
+		curl -k -s -Ffile=@${snapAppName}*_amd64.snap -H "token:$TOKEN" "$URL/raw/upload"
+	"""
 	}
-
 } catch (e) { 
 	currentBuild.result = "FAILED"
 	throw e
