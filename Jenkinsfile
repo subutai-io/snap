@@ -119,11 +119,11 @@ try {
 	def authID = sh (script: """
 		set +x
 		curl -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
-	""" returnStdout: true)
+	""", returnStdout: true)
 	def token = sh (script: """
 		set +x
 		curl -k -Fmessage=\"${authID}\" -Fuser=${user} "${url}/auth/token"
-	""" returnStdout: true)
+	""", returnStdout: true)
 	sh """
 		set +x
 		curl -k -Ffile=@${snapAppName}*_amd64.snap -H "token:$TOKEN" "$URL/raw/upload"
