@@ -118,15 +118,15 @@ try {
 	String user = "jenkins"
 	sh """
 		set +x
-		curl -s -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
+		curl -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
 	"""
 	sh """
 		set +x
-		curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} ${url}/auth/token
+		curl -k -Fmessage=\"${authID}\" -Fuser=${user} "${url}/auth/token"
 	"""
 	sh """
 		set +x
-		curl -k -s -Ffile=@${snapAppName}*_amd64.snap -H "token:$TOKEN" "$URL/raw/upload"
+		curl -k -Ffile=@${snapAppName}*_amd64.snap -H "token:$TOKEN" "$URL/raw/upload"
 	"""
 	}
 } catch (e) { 
