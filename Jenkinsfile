@@ -126,7 +126,7 @@ try {
 	""", returnStdout: true)
 	sh """
 		set +x
-		curl -k -Ffile=@${snapAppName}*_amd64.snap -H "token:$TOKEN" "$URL/raw/upload"
+		curl -k -Ffile=@${snapAppName}*_amd64.snap -H "token:$token" "$URL/raw/upload"
 	"""
 	}
 } catch (e) { 
