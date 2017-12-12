@@ -141,17 +141,17 @@ try {
 		set +x
 		git describe --tag
 	""", returnStdout: true)
-	def HASH = sh (script: """
-		set +x
-		curl -k -Ffile=@${snapname} -Fversion=${version} -H "token:${token}" "${url}/raw/upload"
-	""", returnStdout: true)
 	def signature = sh (script: """
 		set +x
-		echo "${HASH}" | gpg -u ${email} --clearsign --no-tty
+		curl -k -Ffile=@${snapname} -Fversion=${version} -H "token:${token}" "${url}/raw/upload" | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
+	/*def signature = sh (script: """
+	/	set +x
+		echo "${HASH}" | gpg -u ${email} --clearsign --no-tty
+	""", returnStdout: true) */
 	sh """
 		set +x
-		curl -k -s -Ftoken="${token}" -Fsignature="${signature}" "${url}/auth/sign"
+		curl -k -s -Ftoken="${token}" -Fsignature=\"${signature}\" "${url}/auth/sign"
 	"""
 	}
 } catch (e) { 
