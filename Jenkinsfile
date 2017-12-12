@@ -124,13 +124,14 @@ try {
 	String url = "https://devcdn.subut.ai:8338/kurjun/rest"
 	String user = "jenkins"
 	String email = "jenkins@subut.ai"
-	def authID = sh (script: """
+	sh """
 		set +x
-		curl -k ${url}/auth/token?user=${user} | gpg --armor -u ${email} --clearsign --no-tty
-	""", returnStdout: true)
+		curl -k ${url}/auth/token?user=${user} -o filetosign
+		gpg --armor -u ${email} --clearsign filetosign --no-tty
+	"""
 	def token = sh (script: """
 		set +x
-		curl -k -Fmessage=\"${authID}\" -Fuser=${user} "${url}/auth/token"
+		curl -k -Fmessage="`cat filetosign.asc`" -Fuser=${user} "${url}/auth/token"
 	""", returnStdout: true)
 	def snapname = sh (script: """
 		set +x
