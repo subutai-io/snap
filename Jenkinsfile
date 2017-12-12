@@ -6,6 +6,12 @@ notifyBuildDetails = ""
 snapAppName = ""
 commitId = ""
 serenityReportDir = ""
+cdnHost = ""
+
+switch (env.BRANCH_NAME) {
+	case ~/master/: cdnHost = "mastercdn.subut.ai"; break;
+	default: cdnHost = "devcdn.subut.ai"
+}
 
 try {
 	notifyBuild('STARTED')
@@ -111,15 +117,16 @@ try {
 	"""
 
 	// upload snap to Kurjun
-	/*stage("Upload to Kurjun")
+	stage("Upload to Kurjun")
 	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Kurjun"
 	// cdn auth credentials
-	String url = "https://devcdn.subut.ai:8338/kurjun/rest"
+	String url = "https://${cdnHost}:8338/kurjun/rest"
 	String user = "jenkins"
+	String email = "jenkins@subut.ai"
 	def authID = sh (script: """
 		set +x
-		curl -k ${url}/auth/token?user=${user} | gpg --clearsign --no-tty
+		curl -k ${url}/auth/token?user=${user} | gpg --armor -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
 	def token = sh (script: """
 		set +x
@@ -129,11 +136,22 @@ try {
 		set +x
 		ls -t ${snapAppName}*_amd64.snap | head -1	
 	""", returnStdout: true)
+	def version = sh (script: """
+		set +x
+		git describe --tag
+	""", returnStdout: true)
+	def HASH = sh (script: """
+		set +x
+		curl -k -Ffile=@${snapname} -Fversion=${version} -H "token:${token}" "${url}/raw/upload"
+	""", returnStdout: true)
+	def signature = sh (script: """
+		set +x
+		echo ${HASH} | gpg -u ${email} --clearsign --no-tty
+	""", returnStdout: true)
 	sh """
 		set +x
-		curl -k -F "file=@${snapname}" -H "token:${token}" "${url}/raw/upload"
+		curl -k -s -Ftoken="${token}" -Fsignature="${signature}" "${url}/auth/sign"
 	"""
-    */
 	}
 } catch (e) { 
 	currentBuild.result = "FAILED"
