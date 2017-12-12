@@ -121,7 +121,7 @@ try {
 	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Kurjun"
 	// cdn auth credentials
-	String url = "https://${cdnHost}:8338/kurjun/rest"
+	String url = "https://devcdn.subut.ai:8338/kurjun/rest"
 	String user = "jenkins"
 	String email = "jenkins@subut.ai"
 	def authID = sh (script: """
