@@ -130,7 +130,7 @@ try {
 	""", returnStdout: true)
 	sh """
 		set +x
-		curl -k -Ffile=@"$snapname" -H "token:$token" "$url/raw/upload"
+		curl -k -F "file=@$snapname" -H "token:$token" "$url/raw/upload"
 	"""
 	}
 } catch (e) { 
