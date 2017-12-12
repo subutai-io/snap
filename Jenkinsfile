@@ -117,7 +117,7 @@ try {
 	"""
 
 	// upload snap to Kurjun
-	/*stage("Upload to Kurjun")
+	stage("Upload to Kurjun")
 	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Kurjun"
 	// cdn auth credentials
@@ -152,7 +152,6 @@ try {
 		set +x
 		curl -k -s -Ftoken="${token}" -Fsignature="${signature}" "${url}/auth/sign"
 	"""
-    */
 	}
 } catch (e) { 
 	currentBuild.result = "FAILED"
