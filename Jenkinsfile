@@ -146,7 +146,7 @@ try {
 	""", returnStdout: true)
 	def signature = sh (script: """
 		set +x
-		echo ${HASH} | gpg -u ${email} --clearsign --no-tty
+		echo "${HASH}" | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
 	sh """
 		set +x
