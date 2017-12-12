@@ -109,13 +109,13 @@ try {
 
 	node("snapcraft") {
 	// upload snap to ubuntu store
-	stage("Upload to Ubuntu Store")
+	/*stage("Upload to Ubuntu Store")
 	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
 	sh """
 		snapcraft push \$(ls -t ${snapAppName}*_amd64.snap | head -1 ) --release beta
 	"""
-
+	*/
 	// upload snap to Kurjun
 	stage("Upload to Kurjun")
 	unstash "snap"
@@ -143,7 +143,7 @@ try {
 	""", returnStdout: true)
 	def signature = sh (script: """
 		set +x
-		curl -k -Ffile=@${snapname} -Fversion=${version} -H "token:${token}" "${url}/raw/upload" | gpg -u ${email} --clearsign --no-tty
+		curl -k -Ffile=@${snapname} -Fversion="${version}" -H "token:${token}" "${url}/raw/upload" | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
 	/*def signature = sh (script: """
 	/	set +x
