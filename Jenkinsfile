@@ -127,7 +127,7 @@ try {
 	sh """
 		set +x
 		curl -k ${url}/auth/token?user=${user} -o filetosign
-		gpg --armor -u ${email} --clearsign filetosign --no-tty
+		gpg --armor -u ${email} --clearsign --no-tty filetosign
 	"""
 	def token = sh (script: """
 		set +x
