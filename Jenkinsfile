@@ -124,9 +124,13 @@ try {
 		set +x
 		curl -k -Fmessage=\"${authID}\" -Fuser=${user} "${url}/auth/token"
 	""", returnStdout: true)
+	def snapname = sh (script: """
+		set +x
+		ls -t ${snapAppName}*_amd64.snap | head -1	
+	""", returnStdout: true)
 	sh """
 		set +x
-		curl -k -F "file=@${snapAppName}*_amd64.snap" -H "token:$token" "$url/raw/upload"
+		curl -k -Ffile=@"$snapname" -H "token:$token" "$url/raw/upload"
 	"""
 	}
 } catch (e) { 
