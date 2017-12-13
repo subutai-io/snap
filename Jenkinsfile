@@ -109,15 +109,14 @@ try {
 
 	node("snapcraft") {
 	// upload snap to ubuntu store
-	/*stage("Upload to Ubuntu Store")
+	stage("Upload to Ubuntu Store")
 	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
 	sh """
 		snapcraft push \$(ls -t ${snapAppName}*_amd64.snap | head -1 ) --release beta
 	"""
-	*/
 	// upload snap to Kurjun
-	stage("Upload to Kurjun")
+	/*stage("Upload to Kurjun")
 	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Kurjun"
 	// cdn auth credentials
@@ -137,22 +136,22 @@ try {
 		set +x
 		ls -t ${snapAppName}*_amd64.snap | head -1	
 	""", returnStdout: true)
-	/*def version = sh (script: """
+	def version = sh (script: """
 		set +x
 		git describe --tag
-	""", returnStdout: true)*/
+	""", returnStdout: true)
 	def signature = sh (script: """
 		set +x
 		curl -k -Ffile=@${snapname} -H "token:${token}" ${url}/raw/upload | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
-	/*def signature = sh (script: """
-	/	set +x
+	def signature = sh (script: """
+		set +x
 		echo "${HASH}" | gpg -u ${email} --clearsign --no-tty
-	""", returnStdout: true) */
+	""", returnStdout: true) 
 	sh """
 		set +x
 		curl -k -s -Ftoken="${token}" -Fsignature=\"${signature}\" "${url}/auth/sign"
-	"""
+	"""*/
 	}
 } catch (e) { 
 	currentBuild.result = "FAILED"
