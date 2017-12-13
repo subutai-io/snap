@@ -143,7 +143,7 @@ try {
 	""", returnStdout: true)
 	def signature = sh (script: """
 		set +x
-		curl -k -Ffile=@${snapname} -Fversion="${version}" -H "token:${token}" "${url}/raw/upload" | gpg -u ${email} --clearsign --no-tty
+		curl -k -Ffile=@${snapname} -Fversion="${version}" -H "token:${token}" ${url}/raw/upload | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
 	/*def signature = sh (script: """
 	/	set +x
