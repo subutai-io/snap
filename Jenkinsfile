@@ -109,14 +109,14 @@ try {
 
 	node("snapcraft") {
 	// upload snap to ubuntu store
-	stage("Upload to Ubuntu Store")
+	/*stage("Upload to Ubuntu Store")
 	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
 	sh """
 		snapcraft push \$(ls -t ${snapAppName}*_amd64.snap | head -1 ) --release beta
-	"""
+	"""*/
 	// upload snap to Kurjun
-	/*stage("Upload to Kurjun")
+	stage("Upload to Kurjun")
 	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Kurjun"
 	// cdn auth credentials
@@ -126,7 +126,7 @@ try {
 	sh """
 		set +x
 		curl -k ${url}/auth/token?user=${user} -o filetosign
-		gpg --armor -u ${email} --clearsign --no-tty filetosign
+		gpg --armor -u ${email} --clearsign --yes filetosign
 	"""
 	def token = sh (script: """
 		set +x
@@ -151,7 +151,7 @@ try {
 	sh """
 		set +x
 		curl -k -s -Ftoken="${token}" -Fsignature=\"${signature}\" "${url}/auth/sign"
-	"""*/
+	"""
 	}
 } catch (e) { 
 	currentBuild.result = "FAILED"
