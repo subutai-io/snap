@@ -6,12 +6,12 @@ notifyBuildDetails = ""
 snapAppName = ""
 commitId = ""
 serenityReportDir = ""
-cdnHost = ""
+/*cdnHost = ""
 
 switch (env.BRANCH_NAME) {
 	case ~/master/: cdnHost = "mastercdn.subut.ai"; break;
 	default: cdnHost = "devcdn.subut.ai"
-}
+}*/
 
 try {
 	notifyBuild('STARTED')
