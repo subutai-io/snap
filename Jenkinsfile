@@ -134,7 +134,7 @@ try {
 		set +x
 		git describe --tag
 	""", returnStdout: true)
-	def signature = sh (script: """
+	def HASH = sh (script: """
 		set +x
 		curl -k -Ffile=@${snapname} -H "token:${token}" ${url}/raw/upload | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
