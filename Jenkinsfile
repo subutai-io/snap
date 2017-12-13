@@ -137,13 +137,13 @@ try {
 		set +x
 		ls -t ${snapAppName}*_amd64.snap | head -1	
 	""", returnStdout: true)
-	def version = sh (script: """
+	/*def version = sh (script: """
 		set +x
 		git describe --tag
-	""", returnStdout: true)
+	""", returnStdout: true)*/
 	def signature = sh (script: """
 		set +x
-		curl -k -Ffile=@${snapname} -Fversion="${version}" -H "token:${token}" ${url}/raw/upload | gpg -u ${email} --clearsign --no-tty
+		curl -k -Ffile=@${snapname} -H "token:${token}" ${url}/raw/upload | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
 	/*def signature = sh (script: """
 	/	set +x
