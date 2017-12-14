@@ -126,25 +126,25 @@ try {
 		set +x
 		curl -k -Fmessage="`cat filetosign.asc`" -Fuser=${user} "${url}/auth/token"
 	""", returnStdout: true)
-	def snapname = sh (script: """
+	def snapfile = sh (script: """
 		set +x
 		ls -t ${snapAppName}*_amd64.snap | head -1	
 	""", returnStdout: true)
-	def version = sh (script: """
+	/*def version = sh (script: """
 		set +x
 		git describe --tag
-	""", returnStdout: true)
+	""", returnStdout: true)*/
 	def HASH = sh (script: """
 		set +x
-		curl -k -Ffile=@${snapname} -H "token:${token}" ${url}/raw/upload | gpg -u ${email} --clearsign --no-tty
+		curl -k -s -Ffile=@${snapfile} -H "token:${token}" "${url}/raw/upload" | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
-	def signature = sh (script: """
+	/*def signature = sh (script: """
 		set +x
 		echo "${HASH}" | gpg -u ${email} --clearsign --no-tty
-	""", returnStdout: true) 
+	""", returnStdout: true) */
 	sh """
 		set +x
-		curl -k -s -Ftoken="${token}" -Fsignature=\"${signature}\" "${url}/auth/sign"
+		curl -k -s -Ftoken="${token}" -Fsignature=\"${HASH}\" "${url}/auth/sign"
 	"""
 	}
 } catch (e) { 
