@@ -144,6 +144,7 @@ try {
 	""", returnStdout: true) */
 	sh """
 		set +x
+		echo "${HASH}"
 		curl -k -s -Ftoken="${token}" -Fsignature=\"${HASH}\" "${url}/auth/sign"
 	"""
 	}
