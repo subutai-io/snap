@@ -136,7 +136,10 @@ try {
 	""", returnStdout: true)*/
 	def HASH = sh (script: """
 		set +x
-		curl -k -S -F "file=@${snapfile}" -H "token:${token}" "${url}/raw/upload" | gpg -u ${email} --clearsign --no-tty
+		curl -k -S -F "file=@${snapfile}" -H "token:${token}" "${url}/raw/upload" 
+	""", returnStdout: true)
+	def mama = sh (script: """ 
+		echo ${HASH} | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
 	/*def signature = sh (script: """
 		set +x
@@ -145,8 +148,8 @@ try {
 	sh """
 		set +x
 		echo "${HASH}"
-		echo "---${token}---"
-		curl -k -s -Ftoken="${token}" -Fsignature=\"${HASH}\" "${url}/auth/sign"
+		echo "---${mama}---"
+		curl -k -s -Ftoken="${token}" -Fsignature=\"${mama}\" "${url}/auth/sign"
 	"""
 	}
 } catch (e) { 
