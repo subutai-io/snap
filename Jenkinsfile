@@ -138,7 +138,7 @@ try {
 	""", returnStdout: true)*/
 	String HASH = sh (script: """
 		set +x
-		curl -k -S -F "file=@${snapfile}" -H "token:${token}" "${url}/raw/upload" | gpg -u ${email} --clearsign --no-tty
+		curl -k -S -F "file=@${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
 	
 	/*def signature = sh (script: """
