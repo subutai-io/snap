@@ -136,18 +136,18 @@ try {
 	""", returnStdout: true)*/
 	String HASH = sh (script: """
 		set +x
-		curl -k -S -F "file=@${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" | gpg -u ${email} --clearsign --no-tty
+		curl -k -S -F "file=@${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload"
 	""", returnStdout: true)
 	
-	/*def signature = sh (script: """
+	*def signature = sh (script: """
 		set +x
 		echo "${HASH}" | gpg -u ${email} --clearsign --no-tty
-	""", returnStdout: true) */
+	""", returnStdout: true)
 	sh """
 		set +x
 		echo "${HASH}"
 		echo "---${token}---"
-		curl -k -s -Ftoken="${token}" -Fsignature=\"${HASH}\" "${url}/auth/sign"
+		curl -k -s -Ftoken="${token}" -Fsignature=\"${signature}\" "${url}/auth/sign"
 	"""
 	}
 } catch (e) { 
