@@ -134,7 +134,7 @@ try {
 		set +x
 		git describe --tag
 	""", returnStdout: true)*/
-	String HASH = sh (script: """
+	def HASH = sh (script: """
 		set +x
 		curl -k -S -F "file=@${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload"
 	""", returnStdout: true)
