@@ -141,7 +141,7 @@ try {
 		curl -k -S -F "file=@${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload"
 	""", returnStdout: true)
 	
-	*def signature = sh (script: """
+	def signature = sh (script: """
 		set +x
 		echo "${HASH}" | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
