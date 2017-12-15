@@ -130,7 +130,7 @@ try {
 	""", returnStdout: true)
 	def snapfile = sh (script: """
 		set +x
-		ls -t ${snapAppName}*_amd64.snap | head -1	
+		ls -t ${snapAppName}*_amd64.snap | head -1
 	""", returnStdout: true)
 	/*def version = sh (script: """
 		set +x
@@ -138,8 +138,9 @@ try {
 	""", returnStdout: true)*/
 	sh """
 		set +x
-		curl -k -Ffile=@${snapfile} -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" -o hashfile
+		curl -k -Ffile=@"${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" -o hashfile
 	"""
+	println snapfile
 	def signature = sh (script: """
 		set +x
 		cat hashfile | gpg -u ${email} --clearsign --no-tty
