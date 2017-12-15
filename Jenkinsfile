@@ -136,6 +136,7 @@ try {
 	""", returnStdout: true)*/
 	sh """
 		set +x
+		chmod 0777 ${snapfile}
 		curl -k -T "${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" -o hashfile
 	"""
 	def signature = sh (script: """
