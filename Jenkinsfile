@@ -136,9 +136,8 @@ try {
 	""", returnStdout: true)*/
 	sh """
 		set +x
-		curl -k -Ffile=@"${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" -o hashfile
+		curl -k -Ffile=@\"${snapfile}\" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" -o hashfile
 	"""
-	println snapfile
 	def signature = sh (script: """
 		set +x
 		cat hashfile | gpg -u ${email} --clearsign --no-tty
