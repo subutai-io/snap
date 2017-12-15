@@ -138,7 +138,7 @@ try {
 	""", returnStdout: true)*/
 	sh """
 		set +x
-		curl -k -S -F "file=@${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" -o hashfile
+		curl -k -Ffile=@${snapfile} -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" -o hashfile
 	"""
 	def signature = sh (script: """
 		set +x
