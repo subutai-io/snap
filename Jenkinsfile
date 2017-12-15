@@ -136,19 +136,16 @@ try {
 		set +x
 		git describe --tag
 	""", returnStdout: true)*/
-	def HASH = sh (script: """
+	sh """
 		set +x
-		curl -k -S -F "file=@${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload"
-	""", returnStdout: true)
-	
+		curl -k -S -F "file=@${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" -o hashfile
+	"""
 	def signature = sh (script: """
 		set +x
-		echo "${HASH}" | gpg -u ${email} --clearsign --no-tty
+		cat hashfile | gpg -u ${email} --clearsign --no-tty
 	""", returnStdout: true)
 	sh """
 		set +x
-		echo "${HASH}"
-		echo "---${token}---"
 		curl -k -s -Ftoken="${token}" -Fsignature=\"${signature}\" "${url}/auth/sign"
 	"""
 	}
