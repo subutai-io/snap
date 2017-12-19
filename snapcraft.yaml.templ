@@ -26,6 +26,7 @@ apps:
         p2p-service:
                 command: bin/p2p daemon -save $SNAP_DATA/p2p.save -syslog 127.0.0.1:1514
                 daemon: simple
+                restart-condition: always
         dns-service:
                 command: bin/dnsmasq -k
                 daemon: simple
@@ -38,6 +39,7 @@ apps:
         nginx-service:
                 command: bin/nginx.sh start
                 daemon: simple
+                restart-condition: always
         net-post-conf:
                 command: bin/net-post-conf
                 daemon: oneshot 
@@ -128,11 +130,10 @@ parts:
                 plugin: autotools
                 configflags: ["--datadir=/snap/$SNAPCRAFT_PROJECT_NAME/current/share", "--with-config-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/common/lxc", "--disable-werror"]
                 source: https://github.com/lxc/lxc.git
-                source-tag: lxc-2.0.8
+                source-tag: lxc-2.0.9
                 build-packages:
                         - pkg-config
                         - libcap-dev
-                        - libcgmanager-dev
                 organize:
                         snap/(SUBUTAI)/current/share: share 
                         sbin: bin

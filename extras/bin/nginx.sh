@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p $SNAP_DATA/../common/cache/nginx/
+mkdir -p $SNAP_DATA/../common/cache/nginx/proxy_cache/
 mkdir -p $SNAP_DATA/nginx/conf.d/
 mkdir -p $SNAP_DATA/nginx/cache/
 mkdir -p $SNAP_DATA/nginx/log/
