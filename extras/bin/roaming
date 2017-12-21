@@ -3,7 +3,7 @@ while [ ! -S /var/run/openvswitch/db.sock ]; do
     sleep 1
 done
 
-if [ "$(cat /proc/scsi/scsi | grep -c VBOX)" != "0" ]; then
+if [ -n "$(grep ^flags.*\ hyperviisor /proc/cpuinfo)" ]; then
 	while true; do
 		timeout 15 dhclient enp0s3
 	        if [ "$?" != "0" ]; then
