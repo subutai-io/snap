@@ -3,21 +3,75 @@ while [ ! -S /var/run/openvswitch/db.sock ]; do
     sleep 1
 done
 
+function renew_ips(){
+    arr=("$@")
+
+    timeout 15 dhclient ${arr[0]}
+    if [ "$?" != "0" ]; then
+        dhclient -r ${arr[0]}
+   	    /bin/ip addr flush dev ${arr[0]}
+    else
+        if [ "$(ip route list exact 0/0 | grep -c ${arr[0]})" == "0" ]; then
+               ip route del 0/0
+               return
+        fi
+    fi
+    timeout 10 dhclient ${arr[1]}
+    timeout 10 dhclient ${arr[2]}
+    pkill dhclient
+}
+
+function process(){
+    #arrays for interface names
+    ENP_IFACES=()
+    ENS_IFACES=()
+    ENO_IFACES=()
+    ETH_IFACES=()
+
+    #iterate over interface names
+    for iface in `basename -a /sys/class/net/* | sort` ; do
+
+      if [[ $iface == enp* ]] ;
+      then
+          ENP_IFACES+=($iface)
+      fi
+      if [[ $iface == ens* ]] ;
+      then
+          ENS_IFACES+=($iface)
+      fi
+      if [[ $iface == eno* ]] ;
+      then
+          ENO_IFACES+=($iface)
+      fi
+      if [[ $iface == eth* ]] ;
+      then
+          ETH_IFACES+=($iface)
+      fi
+
+    done
+
+    #check/renew ips of 3 similar interfaces
+    if [ ${#ENP_IFACES[@]} == 3 ] ;
+    then
+      renew_ips "${ENP_IFACES[@]}";
+    elif [ ${#ENS_IFACES[@]} == 3 ] ;
+    then
+      renew_ips "${ENS_IFACES[@]}";
+    elif [ ${#ENO_IFACES[@]} == 3 ] ;
+    then
+      renew_ips "${ENO_IFACES[@]}";
+    elif [ ${#ETH_IFACES[@]} == 3 ] ;
+    then
+      renew_ips "${ETH_IFACES[@]}";
+    fi
+
+}
+
+
+#check if we are in a virtual machine
 if [ -n "$(grep ^flags.*\ hypervisor /proc/cpuinfo)" ]; then
 	while true; do
-		timeout 15 dhclient enp0s3
-	        if [ "$?" != "0" ]; then
-			dhclient -r enp0s3
-			/bin/ip addr flush dev enp0s3
-		else
-                        if [ "$(ip route list exact 0/0 | grep -c enp0s3)" == "0" ]; then
-                                ip route del 0/0
-                                continue
-                        fi
-                fi
-		timeout 10 dhclient enp0s8
-		timeout 10 dhclient enp0s9
-	        pkill dhclient
-        	sleep 20
+        process;
+        sleep 20
 	done
 fi
