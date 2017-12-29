@@ -6,18 +6,34 @@ done
 function renew_ips(){
     arr=("$@")
 
+    #obtain IPs or renew lease for secondary interfaces
+    timeout 10 dhclient ${arr[1]}
+    timeout 10 dhclient ${arr[2]}
+
+    #obtain IP or renew lease for primary interface
     timeout 15 dhclient ${arr[0]}
+
+    #in case of error -> renew IP
     if [ "$?" != "0" ]; then
         dhclient -r ${arr[0]}
    	    /bin/ip addr flush dev ${arr[0]}
+   	    timeout 15 dhclient ${arr[0]}
     else
+        #check if default route is on primary interface, refresh otherwise
         if [ "$(ip route list exact 0/0 | grep -c ${arr[0]})" == "0" ]; then
-               ip route del 0/0
-               return
+            ip route del 0/0
+            timeout 15 dhclient ${arr[0]}
+        #check if default route works, refresh otherwise
+        else
+            ping -c2 -w3 8.8.8.8 &>/dev/null
+            if [ "$?" != "0" ]; then
+                ip route del 0/0
+                timeout 15 dhclient ${arr[0]}
+            fi
         fi
     fi
-    timeout 10 dhclient ${arr[1]}
-    timeout 10 dhclient ${arr[2]}
+
+    #kill dhclient for this round
     pkill dhclient
 }
 
