@@ -52,7 +52,7 @@ try {
 				set -e
 				subutai destroy everything
 				if test -f /var/snap/subutai/current/p2p.save; then rm /var/snap/subutai/current/p2p.save; fi
-				find /var/snap/subutai/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
+				find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
 				snap install --dangerous --devmode /tmp/subutai-latest.snap
 				find /tmp -maxdepth 1 -type f -name 'subutai-*' -delete
 			EOF"""
