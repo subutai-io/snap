@@ -7,7 +7,6 @@ mkdir -p $SNAP_DATA/nginx/log/
 mkdir -p $SNAP_DATA/nginx/run/
 mkdir -p $SNAP_DATA/web/ssl/
 mkdir -p $SNAP_DATA/nginx-includes/https/
-mkdir -p $SNAP_DATA/nginx-includes/https/
 
 
 sed -e "s|/snap/subutai/|/snap/$SNAP_NAME/|g" $SNAP/etc/nginx/proxy.conf > $SNAP_DATA/nginx/conf.d/proxy.conf
