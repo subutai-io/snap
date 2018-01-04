@@ -41,7 +41,7 @@ function checkNRestore(){
 
         port=$(expr 10000 + `echo $ipaddr | cut -d'.' -f4`)
 
-        vlan=$(subutai list -i | grep $ipaddr | cut -f1 | rev | cut -d- -f2)
+        vlan=$(subutai list -i | grep $ipaddr | cut -f1 | awk -F'-' '{print $(NF-1)}')
 
         iptables -t nat -A PREROUTING -i p2p$vlan -p tcp -m tcp --dport $port -j DNAT --to-destination $ipaddr:22
 
