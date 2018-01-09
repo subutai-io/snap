@@ -25,7 +25,7 @@ function renew_ips(){
             timeout 15 dhclient ${arr[0]}
         #check if default route works, refresh otherwise
         else
-            ping -c1 -w3 8.8.8.8 &>/dev/null
+            ping -c1 -w7 8.8.8.8 &>/dev/null
             if [ "$?" != "0" ]; then
                 ip route del 0/0
                 timeout 15 dhclient ${arr[0]}
