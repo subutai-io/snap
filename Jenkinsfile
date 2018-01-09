@@ -9,7 +9,7 @@ serenityReportDir = ""
 
 try {
 	notifyBuild('STARTED')
-	node("snapcraft") {
+	node("snapcraft2") {
 		deleteDir()
 
 		stage("Checkout source")
@@ -101,7 +101,7 @@ try {
 	} // end if
 	} // end node
 
-	node("snapcraft") {
+	node("snapcraft2") {
 
 	// upload snap to ubuntu store
 	stage("Upload to Ubuntu Store")
