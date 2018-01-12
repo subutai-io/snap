@@ -8,19 +8,6 @@ function renew_ips(){
     #source variables
     source /etc/environment
 
-    #obtain IPs or renew lease for private interface
-    if [ ! -z "$SUBUTAI_HOST_IFACE" ]; then
-
-        timeout 10 dhclient $SUBUTAI_HOST_IFACE
-        
-    fi
-
-    #obtain IPs or renew lease for NAT interface
-    if [ ! -z "$SUBUTAI_NAT_IFACE" ]; then
-
-        timeout 10 dhclient $SUBUTAI_NAT_IFACE
-    fi
-
 
     #obtain IP or renew lease for bridged interface
     if [ ! -z "$SUBUTAI_BRIDGE_IFACE" ]; then
@@ -61,6 +48,21 @@ function renew_ips(){
         fi
     
     fi
+
+
+    #obtain IPs or renew lease for private interface
+    if [ ! -z "$SUBUTAI_HOST_IFACE" ]; then
+
+        timeout 10 dhclient $SUBUTAI_HOST_IFACE
+
+    fi
+
+    #obtain IPs or renew lease for NAT interface
+    if [ ! -z "$SUBUTAI_NAT_IFACE" ]; then
+
+        timeout 10 dhclient $SUBUTAI_NAT_IFACE
+    fi
+
 
     #kill dhclient for this round
     pkill dhclient
