@@ -3,12 +3,14 @@
 mkdir -p /var/run/openvswitch/
 
 modprobe openvswitch
+RET_OVS=$?
 modprobe iptable_nat
+RET_IPT=$?
 
-while [ $(lsmod | grep -c 'openvswitch\|iptable_nat') -lt 7 ]; do
-	echo "Unable to load openvswitch or iptable_nat kernel module. Please load module manually"
-	sleep 10 
-done
+if [ ! $RET_IPT -eq 0 ] || [ ! $RET_OVS -eq 0 ]; then
+        echo "Unable to load openvswitch or iptable_nat kernel module. Please load module manually"
+        exit 1
+fi
 
 sysctl -w net.ipv4.ip_forward=1
 sysctl -w net.ipv4.conf.all.forwarding=1
