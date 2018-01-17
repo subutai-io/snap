@@ -7,10 +7,10 @@ RET_OVS=$?
 modprobe iptable_nat
 RET_IPT=$?
 
-if [ ! $RET_IPT -eq 0 ] || [ ! $RET_OVS -eq 0 ]; then
+while [ ! $RET_IPT -eq 0 ] || [ ! $RET_OVS -eq 0 ]; do
         echo "Unable to load openvswitch or iptable_nat kernel module. Please load module manually"
-        exit 1
-fi
+        sleep 10
+done
 
 sysctl -w net.ipv4.ip_forward=1
 sysctl -w net.ipv4.conf.all.forwarding=1
