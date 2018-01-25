@@ -21,9 +21,7 @@ Before=shutdown.target reboot.target halt.target
 
 [Service]
 Type=oneshot
-RemainAfterExit=true
-ExecStart=/bin/true
-ExecStop=/bin/sh -c \"systemctl stop snap.${SNAP_NAME}.agent-service.service\"
+ExecStart=/bin/sh -c \"systemctl stop snap.${SNAP_NAME}.agent-service.service\"
 
 [Install]
 WantedBy=halt.target reboot.target shutdown.target" > $DIR/$UNIT
