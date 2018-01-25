@@ -50,7 +50,10 @@ apps:
         cgmanager-service:
                 command: bin/cgmanagerd.sh
                 daemon: simple
-
+        agent-shutdown:
+                command: bin/agent-shutdown
+                daemon: oneshot
+                restart-condition: never
 parts:
         wrappers:
                 plugin: dump 
