@@ -1,0 +1,31 @@
+#!/bin/bash
+
+if [ "$SNAP_NAME" == "" ]; then
+	SNAP_NAME=$(ls /snap | grep subutai | head -n1)
+	SNAP="/snap/$SNAP_NAME/current/"
+	SNAP_DATA="/var/$SNAP"
+	PATH=$PATH:$SNAP/bin/
+fi
+
+UNIT="var-snap-${SNAP_NAME}-agent-shutdown.service"
+DIR="/writable/system-data/etc/systemd/system"
+if [ ! -d $DIR ]; then
+	DIR="/etc/systemd/system"
+fi
+
+
+echo "[Unit]
+Description=Gracefully stop agent
+DefaultDependencies=no
+Before=shutdown.target reboot.target halt.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c \"kill -SIGTERM `pgrep -f "subutai daemon"`\"
+
+[Install]
+WantedBy=halt.target reboot.target shutdown.target" > $DIR/$UNIT
+
+systemctl daemon-reload
+systemctl start $UNIT
+systemctl enable $UNIT
