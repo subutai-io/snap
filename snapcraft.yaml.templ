@@ -157,6 +157,7 @@ parts:
                         - -usr
         p2p:
                 plugin: autotools
+                configflags: ["--branch=$P2P_BRANCH"]
                 make-parameters: [--always-make, snapcraft]
                 source: https://github.com/subutai-io/p2p.git 
                 source-branch: (P2P_BRANCH)
