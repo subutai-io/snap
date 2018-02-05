@@ -62,7 +62,7 @@ try {
 				set +x
 				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
 				set -e
-				echo y | subutai-dev import management
+				subutai-dev import management --local
 			EOF"""
 			
 			/* wait until SS starts */
