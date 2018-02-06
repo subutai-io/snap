@@ -21,7 +21,7 @@ Before=shutdown.target reboot.target halt.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c \"kill -SIGTERM `pgrep -f "subutai daemon"`\"
+ExecStart=/bin/sh -c \"kill -SIGUSR1 `pgrep -f "subutai daemon"`\"
 
 [Install]
 WantedBy=halt.target reboot.target shutdown.target" > $DIR/$UNIT
