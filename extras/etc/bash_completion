@@ -4,8 +4,7 @@ _subutai()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="attach backup batch clone cleanup config daemon demote destroy export import info hostname list metrics p2p portmap promote proxy quota rename restore stats start stop tunnel update vxlan help"
-
+    opts="attach backup batch checkpoint cleanup clone config daemon demote destroy export help hostname import info list log map metrics p2p promote proxy quota rename restore start stats stop tunnel update vxlan"
     case "${prev}" in
         import)
             COMPREPLY=( $(compgen -W "master management ubuntu16" -- ${cur}) )
