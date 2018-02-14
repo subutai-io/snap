@@ -42,7 +42,7 @@ try {
 			unstash "snap"
 
 			sh """
-				scp \$(ls -t ${snapAppName}*_amd64.snap | head -1) root@${env.SS_TEST_NODE_CORE16}:/tmp/subutai-dev-latest.snap
+				scp \$(ls -t ${snapAppName}*_amd64.snap | head -1) root@${env.SS_TEST_NODE_CORE16}:/tmp/subutai-latest.snap
 			"""
 
 			// destroy existing management template on test node and install latest available snap
@@ -50,11 +50,11 @@ try {
 				set +x
 				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
 				set -e
-				subutai-dev destroy everything
-				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
-				find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
-				snap install --dangerous --devmode /tmp/subutai-dev-latest.snap
-				find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
+				subutai destroy everything
+				if test -f /var/snap/subutai/current/p2p.save; then rm /var/snap/subutai/current/p2p.save; fi
+				find /var/snap/subutai/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
+				snap install --dangerous --devmode /tmp/subutai-latest.snap
+				find /tmp -maxdepth 1 -type f -name 'subutai_*' -delete
 			EOF"""
 
 			// install generated management template
@@ -62,7 +62,7 @@ try {
 				set +x
 				ssh root@${env.SS_TEST_NODE_CORE16} <<- EOF
 				set -e
-				subutai-dev import management --local
+				subutai import management --local
 			EOF"""
 			
 			/* wait until SS starts */
