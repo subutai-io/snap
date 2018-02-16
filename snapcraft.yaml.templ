@@ -134,7 +134,7 @@ parts:
                         - -usr/local/share
         lxc:
                 plugin: autotools
-                configflags: ["--datadir=/snap/$SNAPCRAFT_PROJECT_NAME/current/share", "--with-config-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/common/lxc", "--disable-werror"]
+                configflags: ["--datadir=/snap/$SNAPCRAFT_PROJECT_NAME/current/share", "--with-config-path=/var/snap/$SNAPCRAFT_PROJECT_NAME/common/lxc", "--disable-werror", "--enable-doc=false"]
                 source: https://github.com/lxc/lxc.git
                 source-tag: lxc-2.0.9
                 build-packages:
