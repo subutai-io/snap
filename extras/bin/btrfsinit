@@ -27,9 +27,9 @@ if [ "$SNAP_NAME" == "" ]; then
 fi
 if $flag_force; then
 	umount $fs
-	mkfs.btrfs -f $fs
+	mkfs.btrfs -O extref,skinny-metadata -f $fs
 else
-	mkfs.btrfs $fs
+	mkfs.btrfs -O extref,skinny-metadata $fs
 fi
 
 UNIT="var-snap-$(echo ${SNAP_NAME} | sed -e "s/-/\\\x2d/g")-common-lxc.mount"
