@@ -1,0 +1,120 @@
+#!/bin/sh
+# This is a handle of maintaining btrfs file system, scheduled by fs-service
+# 
+set -e
+
+echo_stderr(){
+    echo "$1" >&2
+}
+
+check_root(){
+    if [ "$(id -u)" != "0" ]; then
+        return 1
+    fi  
+}
+
+is_load_allow(){
+    sys_cores=$(nproc)
+    load_1m=$(uptime|awk '{print $(NF-2)}'|sed 's/\..*//')
+    load_5m=$(uptime|awk '{print $(NF-2)}'|sed 's/\..*//') 
+    avg_1m=$((load_1m/sys_cores))
+    avg_5m=$((load_5m/sys_cores))
+
+    if [ "$avg_1m" -gt 8 ] || [ "$avg_5m" -gt 5 ]; then
+        return 1
+    fi
+}
+
+is_io_allow(){
+    # FIXME: This iowait is not a good estimation
+    iowait=$(vmstat|tail -1|awk '{ print $(NF-1)}')
+
+    if [ "$iowait" -gt 20 ]; then
+        return 1
+    fi
+}
+
+fs_sync(){
+    btrfs filesystem sync "$1" >/dev/null 2>&1
+}
+
+fs_balance(){
+    m_total=$(btrfs filesystem df -b "$1"|grep Metadata|head -1|sed "s/.*total=\([0-9]*\).*/\1/")
+    m_used=$(btrfs filesystem df -b "$1"|grep Metadata|head -1|sed "s/.*used=\([0-9]*\).*/\1/")
+    m_ratio=$((100*m_used/m_total))
+    if [ "$m_ratio" -gt 50 ]; then
+        btrfs balance start -musage=50 -dusage=0 "$1" >/dev/null 2>&1
+    fi
+}
+
+fs_scrub(){
+    btrfs scrub start -B "$1"  >/dev/null 2>&1
+}
+
+fs_check(){
+    btrfs check --readonly --qgroup-report --progress "$1"
+}
+
+fs_preset_hourly(){
+    for i in $(btrfs subvolume list -o "$SNAP_FS"|cut -d' ' -f9); do
+        fs_sync "$SNAP_FS/$i"
+        sleep 1
+    done
+}
+
+fs_preset_daily(){
+    for i in $(btrfs subvolume list -o "$SNAP_FS"|cut -d' ' -f9); do
+        while true; do
+            if is_load_allow && is_io_allow; then
+                fs_balance "$SNAP_FS/$i"
+                break
+            else
+                sleep 30
+            fi
+        done
+        sleep 10
+    done
+}
+
+fs_preset_weekly(){
+    for i in $(btrfs subvolume list -o "$SNAP_FS"|cut -d' ' -f9); do
+        while true; do
+            if is_load_allow && is_io_allow; then
+                fs_scrub "$SNAP_FS/$i"
+                break
+            else
+                sleep 30
+            fi
+        done
+        sleep 10
+    done
+}
+
+if ! check_root; then
+    echo_stderr "ERROR: This command must be run as root!"
+    exit 1
+fi
+
+if [ ! -z "$1" ] || [ ! -z "$2" ]; then
+    SNAP_FS=$1
+    LV=$2
+else
+    echo_stderr "ERROR: Not enough argument."
+    exit 1
+fi
+
+case $LV in
+    hourly)
+        fs_preset_hourly           
+        ;;
+    daily)
+        fs_preset_daily
+        ;;
+    weekly)
+        fs_preset_weekly
+        ;;
+    *)
+        echo_stderr "ERROR: Wrong argument."
+        exit 1
+        ;;
+esac

@@ -54,6 +54,9 @@ apps:
                 command: bin/agent-shutdown
                 daemon: oneshot
                 restart-condition: never
+        fs-service:
+                command: bin/fs-service
+                daemon: simple
 parts:
         wrappers:
                 plugin: dump 
