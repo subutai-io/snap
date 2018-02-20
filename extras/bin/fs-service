@@ -1,0 +1,244 @@
+#!/bin/sh
+# This is a dumb service wrapper to get file system maintanence tasks done 
+# properly under snappy constrains where timers are not always available.
+# 
+
+trap sig_HUP 1 2 3 6
+trap sig_TERM 15
+
+# Backend maintainence tool
+# Args: $PATH_TO_CHECK {hourly|daily|weekly}
+FS_MAINT=btrfs-maint
+
+# Scheduling interval
+SCHED_INTERVAL=30
+# DO NOT CHANGE
+SCHED_HOURLY=3600
+SCHED_DAILY=86400
+SCHED_WEEKLY=604800
+
+PID_HOURLY=0
+PID_DAYLY=0
+PID_WEEKLY=0
+
+echo_stderr(){
+    echo "$1" >&2
+}
+
+if [ "$SNAP_NAME" = "" ]; then
+    SNAP_NAME=$(for i in /snap/*; do echo "$i" | grep subutai; done| head -n1 | sed 's/\/snap\///')
+fi
+if [ "$SNAP_NAME" = "" ]; then
+    # Die hard when not possible to determine a proper snap environment
+    echo_stderr "FATAL: Cannot determine SNAP_NAME, quit."
+    exit 1
+fi
+
+SNAP="/snap/$SNAP_NAME/current/"
+SNAP_DATA="/var/$SNAP"
+PATH=$PATH:$SNAP/bin/
+SNAP_FS=/var/snap/$SNAP_NAME/common/lxc
+
+FS_PROP=$SNAP_DATA/fs-service
+FS_TIMESTAMP=$FS_PROP/timestamp
+FS_PIDLOCK=$FS_PROP/pid
+
+check_root(){
+    if [ ! "$(id -u)" = "0" ]; then
+        return 1
+    fi  
+}
+
+is_finished(){
+    if [ ! "$1" -eq 0 ] && kill -s 0 "$1" >/dev/null 2>&1; then
+        return 1;
+    fi
+}
+
+lock_aquire(){
+    PID=$$
+    if [ ! -f "$FS_PIDLOCK" ]; then
+        # Normally we aquire the lock quick
+        mkdir -p "$FS_PROP"
+        echo "$PID" > "$FS_PIDLOCK"
+        return 0
+    fi
+    PID_LOCK=$(cat "$FS_PIDLOCK")
+    if is_finished "$PID_LOCK"; then
+        # Lock owner is dead
+        echo "$PID" > "$FS_PIDLOCK"
+        return 0
+    elif [ "$PID" -eq "$PID_LOCK" ]; then
+        # We are the lock owner
+        return 0
+    fi
+    # Failed to aquire the lock
+    return 1
+}
+
+lock_release(){
+    PID=$$
+    PID_LOCK=0
+    if [ -f "$FS_PIDLOCK" ]; then
+        PID_LOCK=$(cat "$FS_PIDLOCK")
+    fi
+    if [ ! "$PID" -eq "$PID_LOCK" ] && ! is_finished "$PID_LOCK"; then
+        return 1
+    fi
+    rm -f "$FS_PIDLOCK"
+}
+
+sig_HUP(){
+    # Ignoring SIGHUP or likewise
+    true
+}
+
+sig_TERM(){
+    # Quit politely
+    shutdown_graceful
+}
+
+shutdown_graceful(){
+    echo_stderr "INFO: Graceful shutdown requsted, quitting."
+    export SCHED_HALT=1
+    wait
+    lock_release
+    exit 0
+}
+
+check_ecc(){
+    if ! which dmidecode >/dev/null 2>&1; then
+        return 0
+    fi
+    ecc_type=$(dmidecode --type 16 | grep "Error Correction Type" | sed 's/.*: //')
+    if [ "$ecc_type" = "None" ]; then
+        return 1
+    fi
+}
+
+check_mnt(){
+    # $1: full path to check
+    if ! grep btrfs /proc/mounts|grep " $1 " >/dev/null 2>&1; then
+        return 1
+    fi
+
+    mnt_opts=$(grep btrfs /proc/mounts|grep " $1 "|cut -d" " -f4)
+    if echo "$mnt_opts" | grep ro 1>/dev/null 2>&1; then
+        return 1
+    fi
+    if echo "$mnt_opts" | grep nobarrier 1>/dev/null 2>&1; then
+        return 1
+    fi
+}
+
+time_last(){
+    # $1: {hourly|daily|weekly}
+    if [ -z "$1" ]; then
+        return 1
+    fi
+    if [ ! -f "$FS_TIMESTAMP" ]; then
+        mkdir -p "$FS_PROP"
+        echo 0 && return 0
+    fi
+    case $1 in
+        hourly)
+            cut -d',' -f1 < "$FS_TIMESTAMP"
+            ;;
+        daily)
+            cut -d',' -f2 < "$FS_TIMESTAMP"
+            ;;
+        weekly)
+            cut -d',' -f2 < "$FS_TIMESTAMP"
+            ;;
+        *)
+            echo 0 && return 1
+            ;;
+    esac
+}
+
+time_update(){
+    # $1: {hourly|daily|weekly}
+    # $2: timestamp to write
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        return 1
+    fi
+    if [ ! -f "$FS_TIMESTAMP" ]; then
+        mkdir -p "$FS_PROP"
+        echo "0,0,0" > "$FS_TIMESTAMP"
+    fi
+    LT_HOURLY=$(cut -d',' -f1 < "$FS_TIMESTAMP")
+    LT_DAILY=$(cut -d',' -f2 < "$FS_TIMESTAMP")
+    LT_WEEKLY=$(cut -d',' -f3 < "$FS_TIMESTAMP")
+    case $1 in
+        hourly)
+            echo "$2,$LT_DAILY,$LT_WEEKLY" > "$FS_TIMESTAMP"
+            ;;
+        daily)
+            echo "$LT_HOURLY,$2,$LT_WEEKLY" > "$FS_TIMESTAMP"
+            ;;
+        weekly)
+            echo "$LT_HOURLY,$LT_DAILY,$2" > "$FS_TIMESTAMP"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+if ! check_root; then
+    echo_stderr "FATAL: This command must be run as root, quit."
+    exit 1
+fi
+
+if ! lock_aquire; then
+    echo_stderr "FATAL: Another process is running, quit."
+    exit 1
+else
+    echo_stderr "INFO: File system maintenance service is started."
+fi
+
+if ! check_ecc; then
+    echo_stderr "WARN: System RAM does not support ECC, not suitable for production use."
+fi
+
+export SCHED_HALT=0
+while [ "$SCHED_HALT" -lt 1 ]; do
+    TIME_LAST_HOURLY=$(time_last hourly)
+    TIME_LAST_DAILY=$(time_last daily)
+    TIME_LAST_WEEKYLY=$(time_last weekly)
+    TIME_CUR=$(date +%s)
+
+    if ! check_mnt "$SNAP_FS"; then
+        echo_stderr "ERROR: Target filesystem is not mounted properly! Will retry after $SCHED_INTERVAL seconds."
+        sleep "$SCHED_INTERVAL"
+        continue
+    fi
+
+    if test $((TIME_CUR)) -gt "$((TIME_LAST_HOURLY+SCHED_HOURLY))"; then
+        if test "$SCHED_HALT" -lt 1 && is_finished "$PID_HOURLY"; then
+            "$FS_MAINT" "$SNAP_FS" hourly &
+            PID_HOURLY=$!
+            time_update hourly "$TIME_CUR"
+        fi
+    fi
+
+    if test "$TIME_CUR" -gt "$((TIME_LAST_DAILY+SCHED_DAILY))"; then
+        if test "$SCHED_HALT" -lt 1 && is_finished "$PID_DAYLY"; then
+            "$FS_MAINT" "$SNAP_FS" daily &
+            PID_DAYLY=$!
+            time_update daily "$TIME_CUR"
+        fi
+    fi
+
+    if test "$TIME_CUR" -gt "$((TIME_LAST_WEEKYLY+SCHED_WEEKLY))"; then
+        if test "$SCHED_HALT" -lt 1 && is_finished "$PID_WEEKLY"; then
+            "$FS_MAINT" "$SNAP_FS" weekly &
+            PID_WEEKLY=$!
+            time_update weekly "$TIME_CUR"
+        fi
+    fi
+
+    if [ "$SCHED_HALT" -lt 1 ]; then
+        sleep "$SCHED_INTERVAL"
+    fi
+done
