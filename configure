@@ -30,6 +30,3 @@ else
 fi
 sed -e "s/(SNAP_VERSION)/$snap_version/g" -i snapcraft.yaml
 sed -e "s/(SUBUTAI)/$(subutai $branch)/g" -i snapcraft.yaml
-
-# change completion to work with tagged subutai command names
-sed -e "s/\\bsubutai\\b/subutai-$branch/wg" extras/etc/bash_completion.tmpl > extras/etc/bash_completion

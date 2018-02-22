@@ -4,4 +4,8 @@ for i in {1..30}; do
 	sleep 1
 done
 
+snap alias $SNAP_NAME subutai
+
+source $SNAP/etc/bash_completion.tmpl
+
 exec $SNAP/bin/subutai daemon
