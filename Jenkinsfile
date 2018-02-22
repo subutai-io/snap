@@ -62,7 +62,8 @@ try {
 				set +x
 				ssh root@${env.debian_slave_node} <<- EOF
 				set -e
-				subutai-dev import management --local
+				subutai-dev import debian-stretch
+				subutai-dev import management
 			EOF"""
 			
 			/* wait until SS starts */
