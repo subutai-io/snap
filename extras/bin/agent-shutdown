@@ -7,11 +7,6 @@ if [ "$SNAP_NAME" == "" ]; then
 	PATH=$PATH:$SNAP/bin/
 fi
 
-snap alias $SNAP_NAME subutai
-
-source $SNAP/etc/bash_completion.tmpl
-
-
 UNIT="var-snap-${SNAP_NAME}-agent-shutdown.service"
 DIR="/writable/system-data/etc/systemd/system"
 if [ ! -d $DIR ]; then
