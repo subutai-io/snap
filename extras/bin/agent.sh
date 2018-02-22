@@ -4,6 +4,11 @@ for i in {1..30}; do
 	sleep 1
 done
 
+if [ "$SNAP_NAME" == "" ]; then
+	SNAP_NAME=$(ls /snap | grep subutai | head -n1)
+	SNAP="/snap/$SNAP_NAME/current/"
+fi
+
 snap alias $SNAP_NAME subutai
 
 source $SNAP/etc/bash_completion.tmpl
