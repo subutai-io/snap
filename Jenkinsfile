@@ -30,6 +30,8 @@ try {
 		stage("Build snap")
 		notifyBuildDetails = "\nFailed on Stage - Build snap"
 		sh """
+			export LC_ALL=C.UTF-8
+			export LANG=C.UTF-8
 			snapcraft
 		"""
 		stash includes: "subutai-*_amd64.snap", name: 'snap'
