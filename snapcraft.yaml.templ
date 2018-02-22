@@ -1,7 +1,7 @@
 name: (SUBUTAI)
 version: "(SNAP_VERSION)-(SNAP_BRANCH)"
 grade: stable
-confinement: devmode
+confinement: strict
 summary: Open Source LXC orchestration tool
 description: "For more details please visit our site: https://subut.ai"
 
@@ -9,54 +9,61 @@ apps:
         (SUBUTAI):
                 command: bin/subutai
                 aliases: [subutai]
+                plugs: [network,network-control,docker-support,docker,snapd-control,system-observe]
         p2p:
                 command: bin/p2p
+                plugs: [network,network-bind]
         roaming-service:
                 command: bin/roaming
                 daemon: simple
+                plugs: [firewall-control,network-control]
         restore-forwarding-service:
                 command: bin/restore-forwarding
                 daemon: simple
+                plugs: [firewall-control,network-control]
         dhcp-service:
                 command: bin/dhcpd.sh
                 daemon: simple
+                plugs: [network,network-bind,network-control]
         agent-service:
                 command: bin/agent.sh
                 daemon: simple
+                plugs: [network,network-bind,docker-support,system-observe]
         rngd-service:
                 command: bin/rngd -f -r /dev/urandom
                 daemon: simple
+                plugs: [network,network-bind]
         p2p-service:
                 command: bin/p2p daemon -save $SNAP_DATA/p2p.save -syslog 127.0.0.1:1514
                 daemon: simple
                 restart-condition: always
+                plugs: [network,network-bind]
         dns-service:
                 command: bin/dnsmasq -k
                 daemon: simple
+                plugs: [network,network-bind,network-control]
         ovs-init-db-service:
                 command: bin/ovs-init-db
                 daemon: simple
+                plugs: [openvswitch,openvswitch-support,kernel-module-control,network-control,docker-support]
         ovs-init-switch-service:
                 command: bin/ovs-init-switch
                 daemon: simple
+                plugs: [openvswitch,openvswitch-support,kernel-module-control,network-control,docker-support]
         nginx-service:
                 command: bin/nginx.sh start
                 daemon: simple
                 restart-condition: always
+                plugs: [network,network-bind,network-control,docker-support]
         net-post-conf:
                 command: bin/net-post-conf
                 daemon: oneshot 
                 restart-condition: never
-        cgmanager-service:
-                command: bin/cgmanagerd.sh
-                daemon: simple
-        agent-shutdown:
-                command: bin/agent-shutdown
-                daemon: oneshot
-                restart-condition: never
+                plugs: [firewall-control,network-control]
         fs-service:
                 command: bin/fs-service
                 daemon: simple
+                plugs: [mount-observe,system-observe]
 parts:
         wrappers:
                 plugin: dump 
