@@ -38,17 +38,17 @@ try {
 	node() {
 	// Start Test-Peer Lock
 	if (env.BRANCH_NAME == 'dev') {
-		lock('SS_TEST_NODE_NEW') {
+		lock('debian_slave_node') {
 			unstash "snap"
 
 			sh """
-				scp \$(ls -t ${snapAppName}*_amd64.snap | head -1) root@${env.SS_TEST_NODE_NEW}:/tmp/subutai-dev-latest.snap
+				scp \$(ls -t ${snapAppName}*_amd64.snap | head -1) root@${env.debian_slave_node}:/tmp/subutai-dev-latest.snap
 			"""
 
 			// destroy existing management template on test node and install latest available snap
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE_NEW} <<- EOF
+				ssh root@${env.debian_slave_node} <<- EOF
 				set -e
 				subutai-dev destroy management
 				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
@@ -60,9 +60,10 @@ try {
 			// install generated management template
 			sh """
 				set +x
-				ssh root@${env.SS_TEST_NODE_NEW} <<- EOF
+				ssh root@${env.debian_slave_node} <<- EOF
 				set -e
-				subutai-dev import management --local
+				subutai-dev import debian-stretch
+				subutai-dev import management
 			EOF"""
 			
 			/* wait until SS starts */
@@ -70,7 +71,7 @@ try {
 				sh """
 					set +x
 					echo "Waiting SS"
-					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.SS_TEST_NODE_NEW}:8443/rest/v1/peer/ready') != "200" ]; do
+					while [ \$(curl -k -s -o /dev/null -w %{http_code} 'https://${env.debian_slave_node}:8443/rest/v1/peer/ready') != "200" ]; do
 						sleep 5
 					done
 				"""
@@ -87,7 +88,7 @@ try {
 			git url: "https://github.com/subutai-io/playbooks.git"
 			sh """
 				set +e
-				./run_tests_qa.sh -m ${env.SS_TEST_NODE_NEW}
+				./run_tests_qa.sh -m ${env.debian_slave_node}
 				./run_tests_qa.sh -s all
 				${mvnHome}/bin/mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
 				OUT=\$?
