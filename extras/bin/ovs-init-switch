@@ -1,17 +1,17 @@
 #!/bin/bash
-mkdir -p /var/run/openvswitch/
+mkdir -p $SNAP_DATA/var/run/openvswitch/
 
 while [ ! -f $SNAP/bin/ovs-vswitchd ]; do
 	sleep 1
 done
 
-while [ ! -S /var/run/openvswitch/db.sock ]; do
+while [ ! -S $SNAP_DATA/var/run/openvswitch/db.sock ]; do
     sleep 1
 done
 ovs-vsctl --no-wait init
 
-if [ -f "/var/run/openvswitch/vswitchd.pid" ]; then
-    grep "ovs-vswitchd" /proc/`cat /var/run/openvswitch/vswitchd.pid`/cmdline
+if [ -f "$SNAP_DATA/var/run/openvswitch/vswitchd.pid" ]; then
+    grep "ovs-vswitchd" /proc/`cat ${SNAP_DATA}/var/run/openvswitch/vswitchd.pid`/cmdline
     if [ "$?" == "0" ]; then
         echo "ovs-switchd seems already running"
         exit 0
@@ -20,4 +20,4 @@ if [ -f "/var/run/openvswitch/vswitchd.pid" ]; then
     fi
 fi
 
-$SNAP/bin/ovs-vswitchd --pidfile=/var/run/openvswitch/vswitchd.pid --unixctl=/var/run/openvswitch/vswitch.ctl unix:/var/run/openvswitch/db.sock
+$SNAP/bin/ovs-vswitchd --pidfile=${SNAP_DATA}/var/run/openvswitch/vswitchd.pid --unixctl=/var/run/openvswitch/vswitch.ctl unix:/var/run/openvswitch/db.sock
