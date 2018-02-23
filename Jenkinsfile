@@ -111,7 +111,7 @@ try {
 	unstash "snap"
 	notifyBuildDetails = "\nFailed on Stage - Upload to Ubuntu Store"
 	sh """
-		snapcraft push \$(ls -t ${snapAppName}*_amd64.snap | head -1 ) --release beta
+		snapcraft push \$(ls -t ${snapAppName}*_amd64.snap | head -1 ) --release stable
 	"""
 	/*
 	// upload snap to Kurjun
