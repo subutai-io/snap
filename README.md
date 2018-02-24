@@ -30,7 +30,7 @@ for installation on OS with snapd installed.
 The snap repository contains a bash script, autobuild, which automates the build of Subutai peers and resource hosts locally. It has several requirements:
 
 1) Hardware: at least 4 core CPU with enabled VT-X and 8Gb RAM
-2) Software: Ubuntu OS, VirtualBox, [Ubuntu OS](https://cdn.subut.ai:8338/kurjun/rest/raw/get?name=ubuntu16.ova) imported, sshpass
+2) Software: Ubuntu OS, VirtualBox, [Ubuntu OS](https://cdn.subutai.io:8338/kurjun/rest/raw/get?name=ubuntu16.ova) imported, sshpass
 3) Internet connection if Subutai snap package doesn't exist in the same directory
 
 If your system meets these requirements you can simply run `./autobuild.sh` in the cloned directory and get the ready-to-use VM with the Subutai Agent installed in ~2-5 minutes. Autobuild output is pretty verbose, you will be able to see the deployment process take place step by step and debug it in case of failure.
