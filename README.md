@@ -26,23 +26,5 @@ so `./configure` again and `snapcraft clean`.
 If these commands succeed, you will see the Subutai snap package next to snapcraft.yaml which may be used 
 for installation on OS with snapd installed.
 
-## Deploying peers and resource hosts with autobuild
-The snap repository contains a bash script, autobuild, which automates the build of Subutai peers and resource hosts locally. It has several requirements:
-
-1) Hardware: at least 4 core CPU with enabled VT-X and 8Gb RAM
-2) Software: Ubuntu OS, VirtualBox, [Ubuntu OS](https://cdn.subutai.io:8338/kurjun/rest/raw/get?name=ubuntu16.ova) imported, sshpass
-3) Internet connection if Subutai snap package doesn't exist in the same directory
-
-If your system meets these requirements you can simply run `./autobuild.sh` in the cloned directory and get the ready-to-use VM with the Subutai Agent installed in ~2-5 minutes. Autobuild output is pretty verbose, you will be able to see the deployment process take place step by step and debug it in case of failure.
-
-Autobuild supports Subutai virtual machine image export in ova format or in Vagrant box: 
-- `./autobuild.sh -e ova` or 
-- `./autobuild.sh -e box` accordingly, 
-- `./autobuild.sh -d peer.conf` to deploy multiple VMs at once by reading a configuration file with format: 
-
-```
-PEER=1
-RH=2
-```  
-
-"PEER" specifies the number of VMs with a Management Console container imported in each. "RH" specifies the number of resource hosts for each peer.
+## Deploying peers and resource hosts with Vagrant
+You can easily build a peer with our Vagrant boxes. See https://github.com/subutai-io/packer/wiki/Box-User-Guide
