@@ -113,45 +113,6 @@ try {
 	sh """
 		snapcraft push \$(ls -t ${snapAppName}*_amd64.snap | head -1 ) --release beta
 	"""
-	/*
-	// upload snap to Kurjun
-	stage("Upload to Kurjun")
-	unstash "snap"
-	notifyBuildDetails = "\nFailed on Stage - Upload to Kurjun"
-	// cdn auth credentials
-	String url = "https://devcdn.subut.ai:8338/kurjun/rest"
-	String user = "jenkins"
-	String email = "jenkins@subut.ai"
-	sh """
-		set +x
-		curl -k ${url}/auth/token?user=${user} -o filetosign
-		gpg --armor -u ${email} --clearsign --yes filetosign
-	"""
-	def token = sh (script: """
-		set +x
-		curl -k -Fmessage="`cat filetosign.asc`" -Fuser=${user} "${url}/auth/token"
-	""", returnStdout: true)
-	def snapfile = sh (script: """
-		set +x
-		ls -t ${snapAppName}*_amd64.snap | head -1
-	""", returnStdout: true)
-	def version = sh (script: """
-		set +x
-		git describe --tag
-	""", returnStdout: true)
-	sh """
-		set +x
-		chmod 0777 ${snapfile}
-		curl -k -F "file=@${snapfile}" -Ftoken=${token} -H "token:${token}" "${url}/raw/upload" -o hashfile
-	"""
-	def signature = sh (script: """
-		set +x
-		cat hashfile | gpg -u ${email} --clearsign --no-tty
-	""", returnStdout: true)
-	sh """
-		set +x
-		curl -k -s -Ftoken="${token}" -Fsignature=\"${signature}\" "${url}/auth/sign"
-	""" */
 	}
 } catch (e) { 
 	currentBuild.result = "FAILED"
