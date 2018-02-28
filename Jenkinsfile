@@ -15,7 +15,9 @@ try {
 		stage("Checkout source")
 		/* Checkout snap repository */
 		notifyBuildDetails = "\nFailed on Stage - Checkout source"
-
+		sh """
+			rm -rf *
+		"""
 		checkout scm
 
 		commitId = sh (script: "git rev-parse HEAD", returnStdout: true)
