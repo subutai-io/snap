@@ -58,7 +58,7 @@ try {
 				if test -f /var/snap/subutai-dev/current/p2p.save; then sudo rm /var/snap/subutai-dev/current/p2p.save; fi
 				sudo find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
 				sudo snap install --dangerous --devmode /tmp/subutai-dev-latest.snap
-				find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
+				sudo find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
 			EOF"""
 
 			// install generated management template
