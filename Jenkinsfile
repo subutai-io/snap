@@ -41,7 +41,7 @@ try {
 
 	node() {
 	// Start Test-Peer Lock
-	if (env.BRANCH_NAME == 'dev') {
+	if (env.BRANCH_NAME == 'dev123') {
 		lock('debian_slave_node') {
 			unstash "snap"
 
