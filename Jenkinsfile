@@ -46,28 +46,28 @@ try {
 			unstash "snap"
 
 			sh """
-				scp \$(ls -t ${snapAppName}*_amd64.snap | head -1) root@${env.debian_slave_node}:/tmp/subutai-dev-latest.snap
+				scp \$(ls -t ${snapAppName}*_amd64.snap | head -1) admin@${env.debian_slave_node}:/tmp/subutai-dev-latest.snap
 			"""
 
 			// destroy existing management template on test node and install latest available snap
 			sh """
 				set +x
-				ssh root@${env.debian_slave_node} <<- EOF
+				ssh admin@${env.debian_slave_node} <<- EOF
 				set -e
-				subutai-dev destroy management
-				if test -f /var/snap/subutai-dev/current/p2p.save; then rm /var/snap/subutai-dev/current/p2p.save; fi
-				find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
-				snap install --dangerous --devmode /tmp/subutai-dev-latest.snap
-				find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
+				sudo subutai-dev destroy management
+				if test -f /var/snap/subutai-dev/current/p2p.save; then sudo rm /var/snap/subutai-dev/current/p2p.save; fi
+				sudo find /var/snap/subutai-dev/common/lxc/tmpdir/ -maxdepth 1 -type f -name 'management-subutai-template_*' -delete
+				sudo snap install --dangerous --devmode /tmp/subutai-dev-latest.snap
+				sudo find /tmp -maxdepth 1 -type f -name 'subutai-dev_*' -delete
 			EOF"""
 
 			// install generated management template
 			sh """
 				set +x
-				ssh root@${env.debian_slave_node} <<- EOF
+				ssh admin@${env.debian_slave_node} <<- EOF
 				set -e
-				subutai-dev import debian-stretch
-				subutai-dev import management
+				sudo subutai-dev import debian-stretch
+				sudo subutai-dev import management
 			EOF"""
 			
 			/* wait until SS starts */
