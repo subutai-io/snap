@@ -6,9 +6,7 @@
 trap sig_HUP 1 2 3 6
 trap sig_TERM 15
 
-# Backend maintainence tool
 # Args: $PATH_TO_CHECK {hourly|daily|weekly}
-FS_MAINT=btrfs-maint
 
 # Scheduling interval
 SCHED_INTERVAL=30
@@ -42,6 +40,17 @@ SNAP_FS=/var/snap/$SNAP_NAME/common/lxc
 FS_PROP=$SNAP_DATA/fs-service
 FS_TIMESTAMP=$FS_PROP/timestamp
 FS_PIDLOCK=$FS_PROP/pid
+
+check_fs(){
+    BACKEND_FS=$(mount | grep "$SNAP_FS" | awk '{ print $5 }')
+    if [ "$BACKEND_FS" = "zfs" ]; then
+        export FS_MAINT="zfs-maint"
+    elif [ "$BACKEND_FS" = "btrfs" ]; then
+        export FS_MAINT="btrfs-maint"
+    else
+        return 1
+    fi
+}
 
 check_root(){
     if [ ! "$(id -u)" = "0" ]; then
@@ -188,6 +197,10 @@ time_update(){
 if ! check_root; then
     echo_stderr "FATAL: This command must be run as root, quit."
     exit 1
+fi
+
+if ! check_fs; then
+    echo_stderr "FATAL: No active backend file system detected, quit."
 fi
 
 if ! lock_aquire; then

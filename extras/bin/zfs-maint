@@ -1,0 +1,6 @@
+#!/bin/sh
+# Stub script for maintaining zfs storage backend
+#
+
+# Do nothing by default
+exit 0
