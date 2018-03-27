@@ -1,0 +1,47 @@
+#!/bin/bash
+set -x
+set -e
+
+n=1
+while [ $# -gt 0 ]; do
+    case $1 in
+        -*) break;;
+        *) eval "arg_$n=\$1"; n=$(( $n + 1 )) ;;
+    esac
+    shift
+done
+
+flag_dataset=false
+flag_force=false
+while getopts ":df" opt; do
+    case $opt in
+        d) flag_dataset=true;;
+        f) flag_force=true;;
+    esac
+    shift
+done
+
+if [ "$SNAP_NAME" == "" ]; then
+	SNAP_NAME=$(ls /snap | grep subutai | head -n1)
+	SNAP="/snap/$SNAP_NAME/current/"
+	SNAP_DATA="/var/$SNAP"
+	PATH=$PATH:$SNAP/bin/
+fi
+
+fs=$arg_1$1
+fs_path="/var/snap/$SNAP_NAME/common/lxc"
+
+if $flag_dataset; then
+    zfs set mountpoint="$fs_path" $fs
+else
+    if $flag_force; then
+	zpool create -f subutai $fs
+    else
+	zpool create subutai $fs
+    fi
+    rm -rf $fs_path
+    zfs create -o mountpoint="$fs_path" subutai/fs
+fi
+
+mkdir -p $SNAP_DATA/../common/lxc/tmpdir
+mkdir -p $SNAP_DATA/../common/lxc/backups
