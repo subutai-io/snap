@@ -81,6 +81,21 @@ parts:
                 source: https://download.samba.org/pub/rsync/src/rsync-3.1.2.tar.gz
                 prime:
                         - -share
+        zfsutils:
+                plugin: autotools
+                source: https://github.com/zfsonlinux/zfs/releases/download/zfs-0.7.7/zfs-0.7.7.tar.gz
+                configflags: ["--sbindir=/sbin", "--with-config=user", "--disable-shared"]
+                build-packages: 
+                        - libattr1-dev
+                        - libblkid-dev
+                        - libselinux1-dev
+                        - uuid-dev
+                        - zlib1g-dev
+                organize:
+                        sbin: bin
+                prime:
+                        - bin/zfs
+                        - bin/zpool
         btrfs-progs:
                 plugin: autotools
                 configflags: ["--disable-documentation"]
