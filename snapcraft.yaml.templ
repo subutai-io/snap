@@ -87,10 +87,11 @@ parts:
                 source: https://github.com/subutai-io/btrfs-progs.git
                 source-branch: "4.16"
                 build-packages:
-                        - libblkid-dev
-                        - e2fslibs-dev 
-                        - liblzo2-dev
-                        - libzstd1
+                        - libuuid
+                        - libblkid
+                        - liblzo2
+                        - zlib
+                        - libzstd
                 prime:
                         - bin/btrfs  
                         - bin/btrfsck  
