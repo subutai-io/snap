@@ -83,9 +83,8 @@ parts:
                         - -share
         btrfs-progs:
                 plugin: autotools
-                configflags: ["--disable-python","--disable-zstd","--disable-documentation"]
+                configflags: ["--disable-documentation"]
                 source: https://github.com/subutai-io/btrfs-progs.git
-                source-branch: "4.16"
                 build-packages:
                         - libblkid-dev
                         - e2fslibs-dev
